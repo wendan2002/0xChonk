@@ -77,7 +77,8 @@
         <div class="relative cursor-pointer select-none group" id="cat-btn">
             <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-2xl group-active:bg-orange-500/50 transition-all duration-75"></div>
             <div class="w-64 h-64 rounded-full border-4 border-white overflow-hidden relative shadow-[0_0_0_4px_#000,0_10px_20px_rgba(0,0,0,0.5)] cat-idle bg-blue-800 flex items-center justify-center">
-                <img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true">
+                <!-- 嚴格遵守的圖片連結 -->
+                <img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" class="w-full h-full object-cover scale-110 mt-4" alt="Fat Cat" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:100px\'>😼</span>'">
             </div>
         </div>
 
@@ -224,14 +225,13 @@
 
         // --- 每日簽到邏輯 ---
         function checkDailyReward() {
-            const now = new Date().toDateString(); // 取得今天日期 (例如 "Mon Dec 04 2025")
+            const now = new Date().toDateString(); // 取得今天日期
             if (lastLogin !== now) {
-                // 如果上次簽到日期不是今天，彈出視窗
                 setTimeout(() => {
                     const modal = document.getElementById('daily-modal');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
-                }, 1000); // 延遲 1 秒顯示，體驗較好
+                }, 1000); 
             }
         }
 
@@ -321,4 +321,3 @@
     </script>
 </body>
 </html>
-
