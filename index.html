@@ -33,8 +33,10 @@
         .page.active { display: flex; animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .modal-bg { background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
-        .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        /* 簽到彈窗動畫 */
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
 <body class="h-screen flex flex-col bg-gray-900">
@@ -48,10 +50,15 @@
                 <span class="text-xs text-white">PLAYER_1</span>
             </div>
         </div>
-        <button id="wallet-btn" onclick="toggleWalletModal()" class="flex items-center gap-2 bg-black border-2 border-gray-600 px-3 py-1.5 active:translate-y-1 transition-all">
-            <i data-lucide="wallet" class="w-4 h-4 text-gray-400"></i>
-            <span id="wallet-text" class="text-[10px] text-gray-400 truncate max-w-[80px]">Connect</span>
-        </button>
+        <div class="flex gap-2">
+            <button onclick="saveData(true)" class="bg-gray-700 p-1.5 border border-gray-500 hover:bg-gray-600 active:translate-y-1">
+                <i data-lucide="save" class="w-4 h-4 text-white"></i>
+            </button>
+            <button id="wallet-btn" onclick="toggleWalletModal()" class="flex items-center gap-2 bg-black border-2 border-gray-600 px-3 py-1.5 active:translate-y-1 transition-all">
+                <i data-lucide="wallet" class="w-4 h-4 text-gray-400"></i>
+                <span id="wallet-text" class="text-[10px] text-gray-400 truncate max-w-[80px]">Connect</span>
+            </button>
+        </div>
     </div>
 
     <!-- === 頁面 1: 挖礦 (MINE) === -->
@@ -70,11 +77,7 @@
         <div class="relative cursor-pointer select-none group" id="cat-btn">
             <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-2xl group-active:bg-orange-500/50 transition-all duration-75"></div>
             <div class="w-64 h-64 rounded-full border-4 border-white overflow-hidden relative shadow-[0_0_0_4px_#000,0_10px_20px_rgba(0,0,0,0.5)] cat-idle bg-blue-800 flex items-center justify-center">
-                <!-- 圖片：使用您的 Github 連結 -->
-                <img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" 
-                     class="w-full h-full object-cover scale-110" 
-                     alt="Fat Cat" 
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:100px\'>😼</span>'">
+                <img src="https://i.imgur.com/rB00vVd.png" class="w-full h-full object-cover scale-110 mt-4" alt="Fat Cat" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:100px\'>😼</span>'">
             </div>
         </div>
 
@@ -88,20 +91,18 @@
             </div>
         </div>
         
-        <!-- V1.4 新增：商店按鈕 -->
-        <button onclick="toggleShopModal()" class="mt-4 bg-orange-600 text-white text-xs px-6 py-3 border-2 border-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2 group">
-            <i data-lucide="shopping-cart" class="w-4 h-4 group-hover:scale-110 transition-transform"></i> UPGRADE SHOP
+        <button onclick="toggleShopModal()" class="mt-4 bg-orange-600 text-white text-xs px-6 py-3 border-2 border-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2">
+            <i data-lucide="shopping-cart" class="w-4 h-4"></i> UPGRADE SHOP
         </button>
     </div>
 
-    <!-- === 頁面 2: 排行榜 (LEADERBOARD) - V1.4 新增 === -->
+    <!-- === 頁面 2: 排行榜 (LEADERBOARD) === -->
     <div id="view-leaderboard" class="page p-6 overflow-y-auto no-scrollbar">
         <div class="text-center mb-6">
             <h2 class="text-xl text-white mb-1">HALL OF FAME</h2>
             <p class="text-[10px] text-gray-500">Top Fat Cats</p>
         </div>
         
-        <!-- 您的排名 -->
         <div class="bg-gray-800 border-2 border-white p-4 mb-4 flex items-center justify-between shadow-[4px_4px_0_0_#000]">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-black font-bold border-2 border-white">YOU</div>
@@ -113,7 +114,6 @@
             <div class="text-xl font-bold text-gray-500">#999+</div>
         </div>
 
-        <!-- 假數據列表 -->
         <div class="space-y-2" id="leaderboard-list"></div>
     </div>
 
@@ -124,70 +124,42 @@
             <div class="bg-gray-800 border-2 border-white p-3 shadow-[4px_4px_0_0_#000] relative group">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-black border-2 border-white flex items-center justify-center shrink-0"><i data-lucide="twitter" class="text-blue-400 w-5 h-5"></i></div>
-                    <div class="flex-1">
-                        <div class="text-[10px] text-white mb-1">Follow on X</div>
-                        <div class="text-[10px] text-yellow-400">+5,000 CHONK</div>
-                    </div>
-                    <button id="btn-twitter" onclick="handleTask('twitter', 'https://x.com/wendan2002?s=21&t=ay2DEKE011j_yvvPXPAMJg', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
+                    <div class="flex-1"><div class="text-[10px] text-white mb-1">Follow on X</div><div class="text-[10px] text-yellow-400">+5,000 CHONK</div></div>
+                    <button id="btn-twitter" onclick="handleTask('twitter', 'https://twitter.com', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
                 </div>
             </div>
             <div class="bg-gray-800 border-2 border-white p-3 shadow-[4px_4px_0_0_#000] relative group">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-black border-2 border-white flex items-center justify-center shrink-0"><i data-lucide="send" class="text-blue-300 w-5 h-5"></i></div>
-                    <div class="flex-1">
-                        <div class="text-[10px] text-white mb-1">Join Community</div>
-                        <div class="text-[10px] text-yellow-400">+5,000 CHONK</div>
-                    </div>
-                    <button id="btn-telegram" onclick="handleTask('telegram', 'https://t.me/zeroxchonk', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
+                    <div class="flex-1"><div class="text-[10px] text-white mb-1">Join Community</div><div class="text-[10px] text-yellow-400">+5,000 CHONK</div></div>
+                    <button id="btn-telegram" onclick="handleTask('telegram', 'https://telegram.org', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 底部導航 (更新：加入 RANK 按鈕) -->
+    <!-- 底部導航 -->
     <div class="h-20 bg-gray-800 border-t-4 border-white flex justify-around items-center px-2 shrink-0 z-20">
         <button onclick="switchTab('mine')" class="nav-btn flex flex-col items-center gap-1 p-2 text-yellow-400 transition-colors" id="nav-mine"><i data-lucide="pickaxe" class="w-6 h-6"></i><span class="text-[8px]">MINE</span></button>
         <button onclick="switchTab('leaderboard')" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-500 hover:text-white transition-colors" id="nav-leaderboard"><i data-lucide="trophy" class="w-6 h-6"></i><span class="text-[8px]">RANK</span></button>
         <button onclick="switchTab('earn')" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-500 hover:text-white transition-colors" id="nav-earn"><i data-lucide="coins" class="w-6 h-6"></i><span class="text-[8px]">EARN</span></button>
     </div>
 
-    <!-- V1.4 新增：商店彈窗 (Shop Modal) -->
+    <!-- 商店彈窗 -->
     <div id="shop-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-end sm:justify-center p-4">
-        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-sm shadow-[8px_8px_0_0_#000] relative slide-up">
+        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-sm shadow-[8px_8px_0_0_#000] relative">
             <button onclick="toggleShopModal()" class="absolute top-2 right-2 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <h3 class="text-white text-center mb-6 text-sm flex items-center justify-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4"></i> UPGRADE SHOP</h3>
-            
             <div class="space-y-4">
-                <!-- 升級項目 1 -->
                 <div class="bg-gray-900 p-3 border-2 border-gray-600 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-900 border border-blue-500 flex items-center justify-center"><i data-lucide="zap" class="text-yellow-400 w-5 h-5"></i></div>
-                        <div>
-                            <div class="text-[10px] text-white font-bold">Power Glove</div>
-                            <div class="text-[8px] text-gray-400">+100 per tap</div>
-                        </div>
-                    </div>
-                    <button onclick="buyUpgrade('tap')" class="bg-yellow-400 text-black text-[10px] px-3 py-1 border-b-2 border-yellow-600 active:border-0 active:translate-y-1 font-bold flex flex-col items-center min-w-[70px]">
-                        <span>BUY</span>
-                        <span id="price-tap">500</span>
-                    </button>
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-900 border border-blue-500 flex items-center justify-center"><i data-lucide="zap" class="text-yellow-400 w-5 h-5"></i></div><div><div class="text-[10px] text-white font-bold">Power Glove</div><div class="text-[8px] text-gray-400">+100 per tap</div></div></div>
+                    <button onclick="buyUpgrade('tap')" class="bg-yellow-400 text-black text-[10px] px-3 py-1 border-b-2 border-yellow-600 active:border-0 active:translate-y-1 font-bold flex flex-col items-center min-w-[70px]"><span>BUY</span><span id="price-tap">500</span></button>
                 </div>
-                <!-- 升級項目 2 -->
                 <div class="bg-gray-900 p-3 border-2 border-gray-600 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-900 border border-green-500 flex items-center justify-center"><i data-lucide="battery-charging" class="text-green-400 w-5 h-5"></i></div>
-                        <div>
-                            <div class="text-[10px] text-white font-bold">Energy Drink</div>
-                            <div class="text-[8px] text-gray-400">+500 Max Energy</div>
-                        </div>
-                    </div>
-                    <button onclick="buyUpgrade('energy')" class="bg-yellow-400 text-black text-[10px] px-3 py-1 border-b-2 border-yellow-600 active:border-0 active:translate-y-1 font-bold flex flex-col items-center min-w-[70px]">
-                        <span>BUY</span>
-                        <span id="price-energy">1000</span>
-                    </button>
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-green-900 border border-green-500 flex items-center justify-center"><i data-lucide="battery-charging" class="text-green-400 w-5 h-5"></i></div><div><div class="text-[10px] text-white font-bold">Energy Drink</div><div class="text-[8px] text-gray-400">+500 Max Energy</div></div></div>
+                    <button onclick="buyUpgrade('energy')" class="bg-yellow-400 text-black text-[10px] px-3 py-1 border-b-2 border-yellow-600 active:border-0 active:translate-y-1 font-bold flex flex-col items-center min-w-[70px]"><span>BUY</span><span id="price-energy">1000</span></button>
                 </div>
             </div>
-            <p class="text-[8px] text-center text-gray-500 mt-4">Spend CHONK to earn faster!</p>
         </div>
     </div>
 
@@ -197,33 +169,47 @@
             <button onclick="toggleWalletModal()" class="absolute top-2 right-2 text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             <h3 class="text-white text-center mb-6 text-sm">CONNECT WALLET</h3>
             <div class="space-y-3">
-                <button onclick="simulateConnect('Phantom')" class="w-full bg-purple-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-purple-800 transition-colors">
-                    <div class="w-8 h-8 bg-purple-500 rounded-full"></div><span class="text-xs text-white">Phantom</span>
-                </button>
-                <button onclick="simulateConnect('Metamask')" class="w-full bg-orange-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-orange-800 transition-colors">
-                    <div class="w-8 h-8 bg-orange-500 rounded-full"></div><span class="text-xs text-white">Metamask</span>
-                </button>
+                <button onclick="simulateConnect('Phantom')" class="w-full bg-purple-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-purple-800 transition-colors"><div class="w-8 h-8 bg-purple-500 rounded-full"></div><span class="text-xs text-white">Phantom</span></button>
+                <button onclick="simulateConnect('Metamask')" class="w-full bg-orange-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-orange-800 transition-colors"><div class="w-8 h-8 bg-orange-500 rounded-full"></div><span class="text-xs text-white">Metamask</span></button>
             </div>
+        </div>
+    </div>
+
+    <!-- 每日簽到彈窗 (NEW) -->
+    <div id="daily-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-center p-4">
+        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-sm shadow-[8px_8px_0_0_#000] relative pop-in text-center">
+            <div class="text-4xl mb-4 animate-bounce">🎁</div>
+            <h3 class="text-white text-lg mb-2 font-bold">DAILY REWARD</h3>
+            <p class="text-xs text-gray-400 mb-6">Come back every day to earn more!</p>
+            
+            <div class="bg-gray-900 border-2 border-gray-600 p-4 mb-6 rounded-lg">
+                <div class="text-xs text-gray-400 mb-1">REWARD</div>
+                <div class="text-2xl text-yellow-400 font-bold">+5,000 CHONK</div>
+            </div>
+
+            <button onclick="claimDaily()" class="w-full bg-green-500 text-white py-3 border-b-4 border-green-700 active:border-0 active:translate-y-1 font-bold text-xs shadow-lg">
+                CLAIM REWARD
+            </button>
         </div>
     </div>
 
     <script>
         lucide.createIcons();
 
-        // 核心數據 (從 localStorage 讀取)
+        // 核心數據
         let score = parseInt(localStorage.getItem('chonk_score')) || 0;
         let tapLevel = parseInt(localStorage.getItem('chonk_tap_lvl')) || 1;
         let energyLevel = parseInt(localStorage.getItem('chonk_energy_lvl')) || 1;
         let walletAddress = localStorage.getItem('chonk_wallet');
-        
-        // V1.4 新增：數值計算邏輯
+        let lastLogin = localStorage.getItem('chonk_last_login'); // 上次簽到時間
+
+        // 數值計算
         let pointsPerTap = 100 * tapLevel;
         let maxEnergy = 1000 + (energyLevel - 1) * 500;
-        let energy = maxEnergy; // 每次重開補滿，為了體驗好
+        let energy = maxEnergy; 
         let tapPrice = 500 * Math.pow(2, tapLevel - 1);
         let energyPrice = 1000 * Math.pow(2, energyLevel - 1);
 
-        // DOM 元素
         const scoreDisplay = document.getElementById('score-display');
         const ppcDisplay = document.getElementById('ppc-display');
         const energyBar = document.getElementById('energy-bar');
@@ -234,6 +220,34 @@
         if(walletAddress) updateWalletUI(walletAddress);
         updateUI();
         initLeaderboard();
+        checkDailyReward(); // 檢查是否可以簽到
+
+        // --- 每日簽到邏輯 ---
+        function checkDailyReward() {
+            const now = new Date().toDateString(); // 取得今天日期 (例如 "Mon Dec 04 2025")
+            if (lastLogin !== now) {
+                // 如果上次簽到日期不是今天，彈出視窗
+                setTimeout(() => {
+                    const modal = document.getElementById('daily-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }, 1000); // 延遲 1 秒顯示，體驗較好
+            }
+        }
+
+        function claimDaily() {
+            const now = new Date().toDateString();
+            localStorage.setItem('chonk_last_login', now);
+            score += 5000;
+            saveData();
+            updateUI();
+            
+            // 隱藏彈窗
+            document.getElementById('daily-modal').classList.add('hidden');
+            document.getElementById('daily-modal').classList.remove('flex');
+            
+            alert("Daily Reward Claimed! +5,000 CHONK");
+        }
 
         // --- 點擊邏輯 ---
         catBtn.addEventListener('mousedown', handleTap);
@@ -245,168 +259,62 @@
             score += pointsPerTap;
             saveData();
             updateUI();
-
             const container = catBtn.querySelector('div');
-            container.classList.remove('cat-idle');
-            container.style.animation = 'none';
-            container.offsetHeight; 
-            container.style.animation = null; 
-            container.classList.add('cat-tap');
+            container.classList.remove('cat-idle'); container.style.animation = 'none'; container.offsetHeight; container.style.animation = null; container.classList.add('cat-tap');
             setTimeout(() => { container.classList.remove('cat-tap'); container.classList.add('cat-idle'); }, 100);
-
             const rect = catBtn.getBoundingClientRect();
             const x = e.clientX || (rect.left + rect.width/2);
             const y = e.clientY || (rect.top + rect.height/2);
             showFloatingText(x, y, `+${pointsPerTap}`);
-
             if (navigator.vibrate) navigator.vibrate(20);
         }
 
-        // --- V1.4 新增：商店邏輯 ---
+        // --- 商店 & 升級 ---
         function toggleShopModal() {
             const modal = document.getElementById('shop-modal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
-            // 更新價格顯示
+            modal.classList.toggle('hidden'); modal.classList.toggle('flex');
             document.getElementById('price-tap').innerText = tapPrice;
             document.getElementById('price-energy').innerText = energyPrice;
         }
 
         function buyUpgrade(type) {
             if (type === 'tap') {
-                if (score >= tapPrice) {
-                    score -= tapPrice;
-                    tapLevel++;
-                    tapPrice = 500 * Math.pow(2, tapLevel - 1);
-                    pointsPerTap = 100 * tapLevel;
-                    alert("Power Glove Upgraded! Tap power increased.");
-                } else {
-                    alert("Not enough CHONK!");
-                }
+                if (score >= tapPrice) { score -= tapPrice; tapLevel++; tapPrice = 500 * Math.pow(2, tapLevel - 1); pointsPerTap = 100 * tapLevel; alert("Upgraded!"); } else { alert("Not enough CHONK!"); }
             } else if (type === 'energy') {
-                if (score >= energyPrice) {
-                    score -= energyPrice;
-                    energyLevel++;
-                    energyPrice = 1000 * Math.pow(2, energyLevel - 1);
-                    maxEnergy = 1000 + (energyLevel - 1) * 500;
-                    energy = maxEnergy; // 補滿
-                    alert("Energy Drink Consumed! Max Energy increased.");
-                } else {
-                    alert("Not enough CHONK!");
-                }
+                if (score >= energyPrice) { score -= energyPrice; energyLevel++; energyPrice = 1000 * Math.pow(2, energyLevel - 1); maxEnergy = 1000 + (energyLevel - 1) * 500; energy = maxEnergy; alert("Refilled & Upgraded!"); } else { alert("Not enough CHONK!"); }
             }
-            saveData();
-            updateUI();
-            toggleShopModal(); // 關閉並重新打開以更新價格顯示
-            toggleShopModal();
+            saveData(); updateUI(); toggleShopModal(); toggleShopModal();
         }
 
-        // --- V1.4 新增：排行榜假數據 ---
+        // --- 其他功能 ---
         function initLeaderboard() {
             const list = document.getElementById('leaderboard-list');
-            const fakeUsers = [
-                { name: "Elon_Musk", score: "999,999,999" },
-                { name: "Vitalik_ETH", score: "500,000,000" },
-                { name: "Satoshi", score: "100,000,000" },
-                { name: "Doge_King", score: "50,000,000" },
-                { name: "Pepe_Frog", score: "10,000,000" }
-            ];
-            
+            const fakeUsers = [ { name: "Elon_Musk", score: "999M" }, { name: "Vitalik", score: "500M" }, { name: "Doge_King", score: "100M" } ];
             fakeUsers.forEach((u, i) => {
-                const color = i === 0 ? 'text-yellow-400' : (i === 1 ? 'text-gray-400' : (i === 2 ? 'text-orange-700' : 'text-gray-600'));
-                list.innerHTML += `
-                    <div class="flex justify-between items-center p-3 border-b border-gray-700">
-                        <div class="flex items-center gap-3">
-                            <div class="text-sm font-bold ${color}">#${i+1}</div>
-                            <div class="text-xs text-white">${u.name}</div>
-                        </div>
-                        <div class="text-xs text-gray-400 font-mono">${u.score}</div>
-                    </div>
-                `;
+                const color = i===0 ? 'text-yellow-400' : 'text-gray-400';
+                list.innerHTML += `<div class="flex justify-between p-3 border-b border-gray-700"><div class="flex gap-3"><div class="${color} font-bold">#${i+1}</div><div class="text-xs text-white">${u.name}</div></div><div class="text-xs text-gray-400">${u.score}</div></div>`;
             });
         }
 
-        // --- 共通邏輯 ---
         function handleTask(id, url, reward) {
-            const btn = document.getElementById(`btn-${id}`);
-            if(btn.disabled) return;
-            window.open(url, '_blank');
-            btn.innerText = "VERIFYING...";
-            btn.classList.add('opacity-50');
-            setTimeout(() => {
-                score += reward;
-                saveData();
-                updateUI();
-                btn.innerText = "CLAIMED";
-                btn.disabled = true;
-                btn.classList.replace('bg-yellow-400', 'bg-green-500');
-                btn.classList.replace('border-yellow-600', 'border-green-700');
-                btn.classList.replace('text-black', 'text-white');
-                btn.classList.remove('opacity-50');
-            }, 3000);
+            const btn = document.getElementById(`btn-${id}`); if(btn.disabled) return;
+            window.open(url, '_blank'); btn.innerText = "VERIFYING..."; btn.classList.add('opacity-50');
+            setTimeout(() => { score += reward; saveData(); updateUI(); btn.innerText = "CLAIMED"; btn.disabled = true; btn.classList.replace('bg-yellow-400', 'bg-green-500'); btn.classList.replace('border-yellow-600', 'border-green-700'); btn.classList.replace('text-black', 'text-white'); btn.classList.remove('opacity-50'); }, 3000);
         }
 
-        function toggleWalletModal() {
-            const modal = document.getElementById('wallet-modal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+        function toggleWalletModal() { const m = document.getElementById('wallet-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
+        function simulateConnect(p) { 
+            const b = document.querySelector(`button[onclick="simulateConnect('${p}')"]`); b.innerHTML = `<span class="animate-pulse">Connecting...</span>`;
+            setTimeout(() => { const a = "0x" + Math.random().toString(16).substr(2,4).toUpperCase()+"...CHONK"; localStorage.setItem('chonk_wallet', a); updateWalletUI(a); toggleWalletModal(); alert("Connected!"); }, 1500);
         }
+        function updateWalletUI(a) { const b = document.getElementById('wallet-btn'); const t = document.getElementById('wallet-text'); b.classList.replace('bg-black', 'bg-green-900'); b.classList.replace('border-gray-600', 'border-green-500'); t.innerText = a; t.classList.replace('text-gray-400', 'text-green-300'); }
 
-        function simulateConnect(provider) {
-            const btn = document.querySelector(`button[onclick="simulateConnect('${provider}')"]`);
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="animate-pulse">Connecting...</span>`;
-            setTimeout(() => {
-                const mockAddr = "0x" + Math.random().toString(16).substr(2, 4).toUpperCase() + "..." + "CHONK";
-                localStorage.setItem('chonk_wallet', mockAddr);
-                updateWalletUI(mockAddr);
-                toggleWalletModal();
-                btn.innerHTML = originalText;
-                alert(`Connected to ${provider} successfully!`);
-            }, 1500);
-        }
-
-        function updateWalletUI(addr) {
-            const btn = document.getElementById('wallet-btn');
-            const txt = document.getElementById('wallet-text');
-            btn.classList.replace('bg-black', 'bg-green-900');
-            btn.classList.replace('border-gray-600', 'border-green-500');
-            txt.innerText = addr;
-            txt.classList.replace('text-gray-400', 'text-green-300');
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${tabName}`).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-yellow-400'); el.classList.add('text-gray-500'); });
-            document.getElementById(`nav-${tabName}`).classList.remove('text-gray-500');
-            document.getElementById(`nav-${tabName}`).classList.add('text-yellow-400');
-        }
-
-        function showFloatingText(x, y, text) {
-            const el = document.createElement('div');
-            el.className = 'float-num';
-            el.innerText = text;
-            const randomX = (Math.random() - 0.5) * 40;
-            el.style.left = (x + randomX) + 'px';
-            el.style.top = (y - 50) + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
-        }
-
-        function updateUI() {
-            scoreDisplay.innerText = score.toLocaleString();
-            document.getElementById('lb-your-score').innerText = `${score.toLocaleString()} CHONK`;
-            ppcDisplay.innerText = pointsPerTap;
-            energyText.innerText = `${Math.floor(energy)}/${maxEnergy}`;
-            energyBar.style.width = `${(energy/maxEnergy)*100}%`;
-            document.getElementById('user-level').innerText = tapLevel;
-        }
-
-        function saveData() { 
-            localStorage.setItem('chonk_score', score);
-            localStorage.setItem('chonk_tap_lvl', tapLevel);
-            localStorage.setItem('chonk_energy_lvl', energyLevel);
+        function switchTab(t) { document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); document.getElementById(`view-${t}`).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('text-yellow-400');e.classList.add('text-gray-500')}); document.getElementById(`nav-${t}`).classList.remove('text-gray-500'); document.getElementById(`nav-${t}`).classList.add('text-yellow-400'); }
+        function showFloatingText(x, y, t) { const el = document.createElement('div'); el.className = 'float-num'; el.innerText = t; el.style.left = (x+(Math.random()-0.5)*40)+'px'; el.style.top = (y-50)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(), 600); }
+        function updateUI() { scoreDisplay.innerText = score.toLocaleString(); document.getElementById('lb-your-score').innerText = score.toLocaleString(); ppcDisplay.innerText = pointsPerTap; energyText.innerText = Math.floor(energy)+"/"+maxEnergy; energyBar.style.width = (energy/maxEnergy)*100+"%"; document.getElementById('user-level').innerText = tapLevel; }
+        function saveData(alertUser) { 
+            localStorage.setItem('chonk_score', score); localStorage.setItem('chonk_tap_lvl', tapLevel); localStorage.setItem('chonk_energy_lvl', energyLevel); 
+            if(alertUser) alert("Game Saved!"); 
         }
 
         setInterval(() => { if (energy < maxEnergy) { energy += 5; if(energy > maxEnergy) energy = maxEnergy; updateUI(); } }, 1000);
