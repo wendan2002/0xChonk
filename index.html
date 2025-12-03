@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>0xChonk | The Fattest Protocol</title>
+    <title>0xChonk</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
         body {
-            font-family: 'Press Start 2P', cursive; /* 像素字體 */
-            background-color: #1a1a1a;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #111;
             color: #ff9f43;
             overflow: hidden;
             user-select: none;
@@ -19,21 +18,16 @@
             touch-action: manipulation;
         }
 
-        /* 像素貓咪的動畫 */
+        /* 呼吸動畫 */
         @keyframes breathe {
             0% { transform: scale(1); }
             50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
+        .cat-idle { animation: breathe 3s infinite ease-in-out; }
         
-        .cat-idle {
-            animation: breathe 3s infinite ease-in-out;
-        }
-        
-        .cat-tap {
-            transform: scale(0.95) !important;
-            filter: brightness(1.2);
-        }
+        /* 點擊動畫 */
+        .cat-tap { transform: scale(0.95) !important; filter: brightness(1.2); }
 
         /* 浮動數字 */
         @keyframes floatUp {
@@ -47,197 +41,121 @@
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
             z-index: 50;
-            text-shadow: 2px 2px 0px #000;
+            text-shadow: 2px 2px 0 #000;
         }
 
-        /* 自定義進度條 */
-        .pixel-border {
-            box-shadow: 
-                -4px 0 0 0 white,
-                4px 0 0 0 white,
-                0 -4px 0 0 white,
-                0 4px 0 0 white;
-            margin: 4px;
-        }
-        
-        /* 隱藏滾動條 */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen flex flex-col bg-gray-900">
 
-    <!-- 頂部資訊欄 -->
-    <div class="p-4 flex justify-between items-center z-10 bg-gray-900 border-b-4 border-white">
+    <!-- 頂部導航 -->
+    <div class="p-4 flex justify-between items-center z-10 bg-gray-800 border-b-4 border-white">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-orange-500 border-2 border-white flex items-center justify-center text-black text-xs">
-                IMG
+            <div class="w-8 h-8 bg-orange-500 border-2 border-white flex items-center justify-center text-black text-xs font-bold">
+                0x
             </div>
-            <div class="text-xs text-white">Owner</div>
+            <div class="text-xs text-white">CHONK_CEO</div>
         </div>
-        <div class="text-xs text-yellow-400">BETA v1.0</div>
+        <div class="text-[10px] text-yellow-400 blink">LIVE</div>
     </div>
 
-    <!-- 核心遊戲區 (挖礦) -->
-    <div id="view-mining" class="flex-1 flex flex-col items-center justify-center relative w-full transition-opacity duration-300">
+    <!-- 挖礦頁面 -->
+    <div id="view-mining" class="flex-1 flex flex-col items-center justify-center relative w-full">
         
-        <!-- 餘額顯示 -->
-        <div class="mb-8 text-center">
-            <div class="text-xs text-gray-500 mb-2">TOTAL CHONK</div>
-            <div class="text-4xl text-white drop-shadow-md flex items-center justify-center gap-3">
-                <img src="https://cdn-icons-png.flaticon.com/512/12196/12196486.png" class="w-8 h-8 filter invert" />
+        <!-- 分數顯示 -->
+        <div class="mb-6 text-center z-10">
+            <div class="text-[10px] text-gray-500 mb-2 tracking-widest">TOTAL BALANCE</div>
+            <div class="text-3xl text-white drop-shadow-md flex items-center justify-center gap-2">
+                <span class="text-yellow-400">$</span>
                 <span id="score-display">0</span>
             </div>
         </div>
 
-        <!-- 主角：像素貓咪 (點擊區) -->
-        <div class="relative cursor-pointer select-none" id="cat-container">
-            <!-- 貓咪按鈕本體 -->
-            <div class="w-64 h-64 flex items-center justify-center relative cat-idle" id="cat-btn">
-                <!-- 這裡直接顯示像素貓咪圖片 -->
-                <img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true">
-            </div>
+        <!-- 貓咪按鈕 (這裡做了圓形裁切) -->
+        <div class="relative cursor-pointer select-none group" id="cat-btn">
+            <!-- 外圈光暈 -->
+            <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-xl group-active:bg-orange-500/40 transition-all"></div>
             
-            <!-- 能量條 -->
-            <div class="mt-8 w-60 mx-auto">
-                <div class="flex justify-between text-[10px] text-white mb-1">
-                    <span>ENERGY</span>
-                    <span id="energy-text">1000/1000</span>
-                </div>
-                <div class="w-full h-4 bg-gray-800 border-2 border-white relative">
-                    <div id="energy-bar" class="h-full bg-yellow-400 w-full transition-all duration-200"></div>
-                </div>
+            <!-- 圓形容器 -->
+            <div class="w-64 h-64 rounded-full border-4 border-white overflow-hidden relative shadow-[0_0_0_4px_#000] cat-idle bg-blue-800">
+                <!-- 圖片：這裡放您的像素貓 -->
+                <img src="https://i.imgur.com/rB00vVd.png" 
+                     class="w-full h-full object-cover scale-110 mt-4" 
+                     alt="Fat Cat">
+                
+                <!-- 點擊波紋效果 -->
+                <div class="absolute inset-0 bg-white opacity-0 group-active:opacity-20 transition-opacity"></div>
             </div>
         </div>
-            <div class="mt-8 w-60 mx-auto">
-                <div class="flex justify-between text-[10px] text-white mb-1">
-                    <span>ENERGY</span>
-                    <span id="energy-text">1000/1000</span>
-                </div>
-                <div class="w-full h-4 bg-gray-800 border-2 border-white relative">
-                    <div id="energy-bar" class="h-full bg-yellow-400 w-full transition-all duration-200"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- 任務區 (賺錢) -->
-    <div id="view-earn" class="flex-1 hidden w-full p-6 overflow-y-auto no-scrollbar">
-        <h2 class="text-2xl text-white mb-6 text-center">PROTOCOL TASKS</h2>
-        
-        <div class="space-y-4">
-            <!-- 廣告任務 1 -->
-            <div class="bg-gray-800 border-2 border-white p-4 relative group active:scale-95 transition-transform" onclick="completeTask(this, 5000)">
-                <div class="absolute top-0 right-0 bg-yellow-400 text-black text-[10px] px-2 py-1">ADS</div>
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-blue-500 border-2 border-white flex items-center justify-center">
-                        T
-                    </div>
-                    <div>
-                        <div class="text-sm text-white">Follow 0xChonk</div>
-                        <div class="text-xs text-yellow-400 mt-1">+5,000 CHONK</div>
-                    </div>
-                </div>
+        <!-- 能量條 (修復：只留一個) -->
+        <div class="mt-8 w-60 mx-auto z-10">
+            <div class="flex justify-between text-[10px] text-white mb-1">
+                <span>⚡ ENERGY</span>
+                <span id="energy-text">1000/1000</span>
             </div>
-
-            <!-- 廣告任務 2 -->
-            <div class="bg-gray-800 border-2 border-white p-4 relative group active:scale-95 transition-transform" onclick="completeTask(this, 10000)">
-                <div class="absolute top-0 right-0 bg-yellow-400 text-black text-[10px] px-2 py-1">ADS</div>
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-red-500 border-2 border-white flex items-center justify-center">
-                        Y
-                    </div>
-                    <div>
-                        <div class="text-sm text-white">Watch "Cat Video"</div>
-                        <div class="text-xs text-yellow-400 mt-1">+10,000 CHONK</div>
-                    </div>
-                </div>
+            <div class="w-full h-3 bg-gray-700 border-2 border-white relative rounded-full overflow-hidden">
+                <div id="energy-bar" class="h-full bg-yellow-400 w-full transition-all duration-200"></div>
             </div>
         </div>
     </div>
 
-    <!-- 朋友區 (邀請) -->
-    <div id="view-friends" class="flex-1 hidden w-full p-6 flex flex-col items-center text-center">
-        <div class="text-6xl mb-4">🤝</div>
-        <h2 class="text-2xl text-white mb-2">INVITE SQUAD</h2>
-        <p class="text-xs text-gray-400 mb-8 leading-5">
-            Recruit more fat cats to the protocol.<br>Earn 10% of their snacks.
-        </p>
-
-        <div class="w-full bg-gray-800 p-4 border-2 border-white mb-4 overflow-hidden relative">
-            <div class="text-[10px] text-gray-500 mb-1">YOUR LINK</div>
-            <div class="text-xs text-blue-300 truncate" id="invite-link">Loading...</div>
-        </div>
-
-        <button onclick="copyInvite()" class="w-full bg-yellow-400 text-black py-4 border-b-4 border-r-4 border-yellow-600 active:border-0 active:translate-y-1 transition-all font-bold">
-            COPY LINK
+    <!-- 底部選單 -->
+    <div class="h-16 bg-gray-800 border-t-4 border-white flex justify-around items-center px-2 z-20">
+        <button class="flex flex-col items-center gap-1 p-2 text-yellow-400">
+            <span class="text-xl">⛏️</span>
+            <span class="text-[8px]">MINE</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 p-2 text-gray-400 opacity-50 cursor-not-allowed">
+            <span class="text-xl">💰</span>
+            <span class="text-[8px]">EARN</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 p-2 text-gray-400 opacity-50 cursor-not-allowed">
+            <span class="text-xl">🤝</span>
+            <span class="text-[8px]">FRIENDS</span>
         </button>
     </div>
 
-    <!-- 底部導航 -->
-    <div class="h-20 bg-gray-900 border-t-4 border-white flex justify-around items-center px-2 z-20">
-        <button onclick="switchTab('mining')" class="flex flex-col items-center gap-1 p-2 active:scale-90 transition-transform text-yellow-400">
-            <div class="w-8 h-8 border-2 border-current flex items-center justify-center bg-black">⛏️</div>
-            <span class="text-[10px]">MINE</span>
-        </button>
-        <button onclick="switchTab('earn')" class="flex flex-col items-center gap-1 p-2 active:scale-90 transition-transform text-gray-500 hover:text-white">
-            <div class="w-8 h-8 border-2 border-current flex items-center justify-center bg-black">💰</div>
-            <span class="text-[10px]">EARN</span>
-        </button>
-        <button onclick="switchTab('friends')" class="flex flex-col items-center gap-1 p-2 active:scale-90 transition-transform text-gray-500 hover:text-white">
-            <div class="w-8 h-8 border-2 border-current flex items-center justify-center bg-black">👯</div>
-            <span class="text-[10px]">SQUAD</span>
-        </button>
-    </div>
-
-    <!-- 遊戲邏輯腳本 -->
     <script>
-        // --- 核心數據 ---
-        let score = parseInt(localStorage.getItem('chonk_score')) || 0;
+        let score = parseInt(localStorage.getItem('chonk_score')) || 5000;
         let energy = 1000;
         const maxEnergy = 1000;
         
-        // 初始化顯示
         const scoreDisplay = document.getElementById('score-display');
         const energyBar = document.getElementById('energy-bar');
         const energyText = document.getElementById('energy-text');
-        const inviteLink = document.getElementById('invite-link');
-
-        scoreDisplay.innerText = score.toLocaleString();
-        
-        // 模擬生成邀請連結
-        const userId = Math.floor(Math.random() * 1000000);
-        inviteLink.innerText = `t.me/ZeroXChonkBot?start=${userId}`;
-
-        // --- 點擊邏輯 ---
         const catBtn = document.getElementById('cat-btn');
-        const catContainer = document.getElementById('cat-container');
 
+        // 初始化
+        scoreDisplay.innerText = score.toLocaleString();
+
+        // 點擊事件
         catBtn.addEventListener('mousedown', handleTap);
         catBtn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e.touches[0]); });
 
         function handleTap(e) {
             if (energy < 10) return;
 
-            // 扣能量加分
             energy -= 10;
-            score += 100; // 胖貓每次賺比較多
+            score += 100;
             
-            // 更新 UI
             updateUI();
-            
-            // 存檔
             localStorage.setItem('chonk_score', score);
 
-            // 視覺特效
-            catBtn.classList.add('cat-tap');
-            setTimeout(() => catBtn.classList.remove('cat-tap'), 100);
+            // 動畫
+            catBtn.querySelector('div').classList.remove('cat-idle');
+            catBtn.querySelector('div').classList.add('cat-tap');
+            setTimeout(() => {
+                catBtn.querySelector('div').classList.remove('cat-tap');
+                catBtn.querySelector('div').classList.add('cat-idle');
+            }, 100);
 
             // 浮動數字
-            showFloatingText(e.clientX || e.pageX, e.clientY || e.pageY);
+            const x = e.clientX || e.pageX;
+            const y = e.clientY || e.pageY;
+            showFloatingText(x, y);
 
-            // 震動
             if (navigator.vibrate) navigator.vibrate(15);
         }
 
@@ -251,10 +169,10 @@
             setTimeout(() => el.remove(), 800);
         }
 
-        // --- 能量恢復循環 ---
+        // 能量恢復
         setInterval(() => {
             if (energy < maxEnergy) {
-                energy += 5; // 胖貓恢復慢
+                energy += 2;
                 if(energy > maxEnergy) energy = maxEnergy;
                 updateUI();
             }
@@ -265,46 +183,6 @@
             energyText.innerText = `${Math.floor(energy)}/${maxEnergy}`;
             energyBar.style.width = `${(energy/maxEnergy)*100}%`;
         }
-
-        // --- 頁面切換 ---
-        function switchTab(tabName) {
-            ['mining', 'earn', 'friends'].forEach(t => {
-                document.getElementById(`view-${t}`).classList.add('hidden');
-            });
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            document.getElementById(`view-${tabName}`).classList.add('flex'); // friends 需要 flex
-            
-            // 按鈕樣式更新 (簡化版)
-            // 實際專案可以用 classList toggle
-        }
-
-        // --- 任務邏輯 ---
-        function completeTask(el, reward) {
-            if(el.style.opacity === '0.5') return;
-            
-            // 模擬完成
-            score += reward;
-            localStorage.setItem('chonk_score', score);
-            updateUI();
-            
-            el.style.opacity = '0.5';
-            el.innerHTML = `<div class="text-center text-green-400 font-bold">COMPLETED</div>`;
-            
-            alert(`Earned ${reward} CHONK! (Dev gets ad revenue)`);
-        }
-
-        function copyInvite() {
-            navigator.clipboard.writeText(inviteLink.innerText);
-            alert('Link Copied! Send to your friends.');
-        }
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
