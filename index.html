@@ -1,381 +1,724 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>0xChonk | Fat Cat Protocol</title>
+    <title>0xChonk - Fat Cat Protocol</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Pixel Style) -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: white;
+            overflow: hidden; /* 防止滾動 */
+            user-select: none; /* 防止選取文字 */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 胖貓的動畫 */
+        .cat-bounce {
+            transition: transform 0.1s;
+        }
+        .cat-bounce:active {
+            transform: scale(0.95);
+        }
+        
+        /* 浮動數字動畫 */
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
+        }
+        .float-number {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            font-weight: bold;
             font-family: 'Press Start 2P', cursive;
-            background-color: #0f0f0f;
-            color: #ff9f43;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+            text-shadow: 2px 2px 0px #000;
+            z-index: 50;
         }
 
-        /* === 1. 開場動畫特效 (Intro) === */
-        #loading-screen { transition: opacity 0.5s ease-out; }
-        .glitch { position: relative; animation: glitch-skew 1s infinite linear alternate-reverse; }
-        @keyframes glitch-skew { 0% { transform: skew(0deg); } 20% { transform: skew(-2deg); } 40% { transform: skew(2deg); } 60% { transform: skew(-1deg); } 80% { transform: skew(1deg); } 100% { transform: skew(0deg); } }
-        .loading-bar { transition: width 0.2s linear; }
-
-        /* === 2. 貓咪動態特效 (Animations) === */
-        @keyframes breathe { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .cat-idle { animation: breathe 3s infinite ease-in-out; }
-        .cat-tap { animation: tap-bounce 0.1s cubic-bezier(0.1, 0.7, 1.0, 0.1); filter: brightness(1.3); }
-        @keyframes tap-bounce { 0% { transform: scale(1); } 50% { transform: scale(0.92); } 100% { transform: scale(1); } }
-
-        /* === 3. 爆擊震動特效 (Critical Hit) === */
-        .crit-shake { animation: shake 0.2s; }
-        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
-
-        /* === 4. 造型濾鏡系統 (Skin Filters) === */
+        /* 造型濾鏡 */
         .skin-default { filter: none; }
-        .skin-gold { filter: sepia(100%) saturate(300%) brightness(110%) hue-rotate(5deg) drop-shadow(0 0 10px gold); }
-        .skin-cyber { filter: hue-rotate(180deg) contrast(150%) brightness(120%) drop-shadow(0 0 5px cyan); }
+        .skin-gold { filter: drop-shadow(0 0 10px gold) sepia(1) saturate(5); }
+        .skin-hacker { filter: drop-shadow(0 0 5px #0f0) hue-rotate(90deg) contrast(1.2); }
+        .skin-neon { filter: drop-shadow(0 0 10px #f0f) hue-rotate(280deg); }
 
-        /* === 5. 浮動數字 === */
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5); } }
-        .float-num { position: absolute; color: white; font-size: 28px; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 50; text-shadow: 3px 3px 0 #000; -webkit-text-stroke: 1px black; }
-        .float-crit { color: #ffeb3b !important; font-size: 36px !important; text-shadow: 4px 4px 0 #ff0000 !important; z-index: 60; }
+        /* 能量條動畫 */
+        .progress-bar {
+            transition: width 0.5s ease-out;
+        }
 
-        /* 通用 UI */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .page { display: none; width: 100%; height: 100%; flex-direction: column; }
-        .page.active { display: flex; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-bg { background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
-        .wheel-container { transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* 轉盤樣式 */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 4px solid #facc15;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            background: conic-gradient(
+                #ef4444 0deg 45deg, 
+                #3b82f6 45deg 90deg, 
+                #22c55e 90deg 135deg, 
+                #eab308 135deg 180deg, 
+                #a855f7 180deg 225deg, 
+                #ec4899 225deg 270deg, 
+                #f97316 270deg 315deg, 
+                #64748b 315deg 360deg
+            );
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid white;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+        }
+
+        /* 自定義滾動條 (用於排行榜) */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 3px;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col bg-gray-900">
+<body class="h-screen w-screen flex flex-col relative">
 
-    <!-- === [開場動畫] === -->
-    <div id="loading-screen" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8">
-        <div class="text-4xl mb-6 glitch text-orange-500">0xCHONK</div>
-        <div class="w-full max-w-xs h-4 bg-gray-800 border-2 border-gray-600 mb-2 relative overflow-hidden">
-            <div id="loading-fill" class="h-full bg-green-500 w-0 loading-bar"></div>
-        </div>
-        <div id="loading-text" class="text-[10px] text-green-400 font-mono">INITIALIZING...</div>
-    </div>
+    <!-- 粒子背景 (模擬) -->
+    <div id="bg-particles" class="absolute inset-0 pointer-events-none opacity-20 z-0"></div>
 
     <!-- 頂部資訊欄 -->
-    <div class="h-16 px-4 flex justify-between items-center z-20 bg-gray-800 border-b-4 border-white shrink-0">
+    <div class="z-10 w-full px-4 pt-4 pb-2 bg-slate-900/90 backdrop-blur border-b border-slate-700 flex justify-between items-center shadow-lg">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-orange-500 border-2 border-white flex items-center justify-center text-black text-xs font-bold shadow-[2px_2px_0_0_#000]">0x</div>
-            <div class="flex flex-col">
-                <span class="text-[8px] text-gray-400">LVL <span id="user-level">1</span></span>
-                <span class="text-xs text-white">PLAYER_1</span>
+            <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-slate-900 font-bold border-2 border-white">
+                <i class="fa-solid fa-cat"></i>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 font-bold">0xChonk</div>
+                <div class="text-[10px] bg-purple-600 px-1 rounded text-white inline-block">LV.<span id="level-display">1</span></div>
             </div>
         </div>
-        <div class="flex gap-2">
-            <!-- [轉盤按鈕] -->
-            <button onclick="toggleSpinModal()" class="bg-purple-600 p-1.5 border border-purple-400 hover:bg-purple-500 active:translate-y-1 rounded relative">
-                <i data-lucide="dices" class="w-4 h-4 text-white"></i>
-                <div id="spin-badge" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping hidden"></div>
-            </button>
-            <button onclick="saveData(true)" class="bg-gray-700 p-1.5 border border-gray-500 hover:bg-gray-600 active:translate-y-1 rounded"><i data-lucide="save" class="w-4 h-4 text-white"></i></button>
-            <button id="wallet-btn" onclick="toggleWalletModal()" class="flex items-center gap-2 bg-black border-2 border-gray-600 px-3 py-1.5 active:translate-y-1 transition-all">
-                <i data-lucide="wallet" class="w-4 h-4 text-gray-400"></i>
-                <span id="wallet-text" class="text-[10px] text-gray-400 truncate max-w-[80px]">Connect</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- === 頁面 1: 挖礦 (MINE) === -->
-    <div id="view-mine" class="page active items-center justify-center relative">
-        <div class="mb-2 text-center z-10">
-            <div class="text-[8px] text-gray-500 mb-2 tracking-widest uppercase">Total Balance</div>
-            <div class="text-3xl text-white drop-shadow-md flex items-center justify-center gap-2">
-                <img src="https://cdn-icons-png.flaticon.com/512/12196/12196486.png" class="w-6 h-6 animate-pulse filter invert" />
+        <div class="text-right">
+            <div class="text-xs text-slate-400">錢包餘額</div>
+            <div class="text-xl font-black text-yellow-400 font-mono tracking-wider flex items-center gap-1 justify-end">
+                <img src="https://cryptologos.cc/logos/solana-sol-logo.png" class="w-4 h-4" alt="SOL">
                 <span id="score-display">0</span>
             </div>
-            <div class="text-[10px] text-green-400 mt-1 flex items-center justify-center gap-1">
-                <i data-lucide="zap" class="w-3 h-3"></i> <span id="ppc-display">100</span> / tap
-            </div>
         </div>
+    </div>
 
-        <div class="relative cursor-pointer select-none group" id="cat-btn">
-            <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-2xl group-active:bg-orange-500/50 transition-all duration-75"></div>
-            <div class="w-64 h-64 rounded-full border-4 border-white overflow-hidden relative shadow-[0_0_0_4px_#000,0_10px_20px_rgba(0,0,0,0.5)] cat-idle bg-blue-800 flex items-center justify-center">
-                <!-- 嚴格遵守圖片 (支援造型濾鏡) -->
-                <img id="cat-img" src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" class="w-full h-full object-cover scale-110 mt-4 transition-all duration-300 skin-default" alt="Fat Cat" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:100px\'>😼</span>'">
-            </div>
-        </div>
-
-        <div class="mt-6 w-64 mx-auto z-10">
-            <div class="flex justify-between text-[10px] text-white mb-1 px-1">
-                <span class="flex items-center gap-1">⚡ ENERGY</span>
-                <span id="energy-text">1000/1000</span>
-            </div>
-            <div class="w-full h-4 bg-gray-700 border-2 border-white relative shadow-[2px_2px_0_0_#000]">
-                <div id="energy-bar" class="h-full bg-gradient-to-r from-yellow-500 to-orange-500 w-full transition-all duration-200"></div>
-            </div>
-        </div>
+    <!-- 主要內容區域 (切換) -->
+    <main id="main-container" class="flex-1 relative overflow-y-auto z-10 pb-20">
         
-        <button onclick="toggleShopModal()" class="mt-4 bg-orange-600 text-white text-xs px-6 py-3 border-2 border-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2">
-            <i data-lucide="shopping-cart" class="w-4 h-4"></i> SHOP & SKINS
+        <!-- 頁面 1: 首頁 (點擊挖礦) -->
+        <div id="page-home" class="page-content h-full flex flex-col items-center justify-center">
+            
+            <!-- 能量條 -->
+            <div class="w-3/4 mb-6">
+                <div class="flex justify-between text-xs text-slate-300 mb-1">
+                    <span>⚡ 體力值</span>
+                    <span><span id="energy-current">1000</span>/<span id="energy-max">1000</span></span>
+                </div>
+                <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden border border-slate-600">
+                    <div id="energy-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full progress-bar" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- 大胖貓 (點擊區域) -->
+            <div class="relative w-64 h-64 flex items-center justify-center cursor-pointer select-none" id="click-zone">
+                <!-- 光暈效果 -->
+                <div class="absolute inset-0 bg-yellow-500 blur-3xl opacity-10 rounded-full animate-pulse"></div>
+                
+                <!-- 貓咪 SVG -->
+                <div id="cat-avatar" class="cat-bounce skin-default w-full h-full relative z-10">
+                    <!-- 使用 SVG 繪製一隻像素風格的胖橘貓 -->
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-2xl">
+                        <!-- 身體 -->
+                        <rect x="40" y="60" width="120" height="110" rx="40" fill="#fb923c" />
+                        <!-- 肚子 -->
+                        <ellipse cx="100" cy="120" rx="40" ry="35" fill="#fed7aa" />
+                        <!-- 耳朵 -->
+                        <polygon points="50,70 30,30 80,60" fill="#fb923c" />
+                        <polygon points="150,70 170,30 120,60" fill="#fb923c" />
+                        <!-- 眼睛 -->
+                        <rect x="65" y="85" width="15" height="15" rx="5" fill="#1e293b" />
+                        <rect x="120" y="85" width="15" height="15" rx="5" fill="#1e293b" />
+                        <!-- 嘴巴 -->
+                        <path d="M 90 110 Q 100 120 110 110" stroke="#7c2d12" stroke-width="3" fill="none" />
+                        <!-- 花紋 -->
+                        <rect x="90" y="60" width="20" height="10" rx="2" fill="#c2410c" />
+                        <rect x="40" y="100" width="10" height="20" rx="2" fill="#c2410c" />
+                        <rect x="150" y="100" width="10" height="20" rx="2" fill="#c2410c" />
+                        <!-- 手持物品 (隨機出現) -->
+                    </svg>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center animate-bounce text-slate-400 text-sm">
+                👆 瘋狂點擊 0xChonk
+            </div>
+        </div>
+
+        <!-- 頁面 2: 任務 (Earn) -->
+        <div id="page-earn" class="page-content hidden p-4">
+            <h2 class="text-2xl font-bold text-center mb-6 text-yellow-400 font-['Press_Start_2P'] uppercase">任務牆</h2>
+            
+            <div class="space-y-4">
+                <!-- 每日簽到 -->
+                <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold">每日簽到</div>
+                            <div class="text-xs text-slate-400">+1,000 Pts</div>
+                        </div>
+                    </div>
+                    <button id="btn-daily-checkin" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition">領取</button>
+                </div>
+
+                <!-- 社交任務 -->
+                <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-sky-500/20 rounded-lg flex items-center justify-center text-sky-400">
+                            <i class="fa-brands fa-twitter"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold">追蹤 Twitter</div>
+                            <div class="text-xs text-slate-400">+5,000 Pts</div>
+                        </div>
+                    </div>
+                    <button onclick="completeTask('twitter', 5000, 'https://twitter.com/0xChonk')" id="btn-task-twitter" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition">去追蹤</button>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-400/20 rounded-lg flex items-center justify-center text-blue-300">
+                            <i class="fa-brands fa-telegram"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold">加入 TG 頻道</div>
+                            <div class="text-xs text-slate-400">+5,000 Pts</div>
+                        </div>
+                    </div>
+                    <button onclick="completeTask('telegram', 5000, '#')" id="btn-task-telegram" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition">加入</button>
+                </div>
+            </div>
+            
+            <!-- 邀請好友 -->
+            <div class="mt-8 bg-gradient-to-r from-purple-900 to-indigo-900 rounded-xl p-6 border border-purple-500/30 text-center">
+                <h3 class="text-lg font-bold mb-2">邀請好友 (Frens)</h3>
+                <p class="text-sm text-slate-300 mb-4">每邀請一位好友，雙方各得 25,000 Pts</p>
+                <div class="bg-black/30 p-2 rounded text-xs break-all font-mono mb-4 text-slate-400" id="invite-link">https://t.me/ChonkBot?start=ref_123</div>
+                <button onclick="copyInvite()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-[0_4px_0_rgb(180,83,9)] active:shadow-none active:translate-y-[4px] transition">
+                    複製連結
+                </button>
+            </div>
+        </div>
+
+        <!-- 頁面 3: 商店 (Shop) -->
+        <div id="page-shop" class="page-content hidden p-4">
+            <h2 class="text-2xl font-bold text-center mb-6 text-yellow-400 font-['Press_Start_2P'] uppercase">黑市商店</h2>
+
+            <!-- 升級道具 -->
+            <div class="mb-6">
+                <h3 class="text-sm text-slate-400 uppercase tracking-wider mb-3 font-bold">能力升級</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- 點擊強化 -->
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700" onclick="buyUpgrade('click')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-2xl">💪</div>
+                            <div class="text-xs text-yellow-500 font-bold" id="cost-click">500 Pts</div>
+                        </div>
+                        <div class="font-bold text-sm">貓掌強化</div>
+                        <div class="text-xs text-slate-500">Lv.<span id="lvl-click">1</span> (+1/tap)</div>
+                    </div>
+                    <!-- 能量回復 -->
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700" onclick="buyUpgrade('energy')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-2xl">⚡</div>
+                            <div class="text-xs text-yellow-500 font-bold" id="cost-energy">1000 Pts</div>
+                        </div>
+                        <div class="font-bold text-sm">貓薄荷飲料</div>
+                        <div class="text-xs text-slate-500">Lv.<span id="lvl-energy">1</span> (+能量上限)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 造型購買 -->
+            <div>
+                <h3 class="text-sm text-slate-400 uppercase tracking-wider mb-3 font-bold">稀有造型 (NFT)</h3>
+                <div class="space-y-3">
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
+                                <div class="w-6 h-6 bg-orange-400 rounded skin-gold"></div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-yellow-400">黃金招財貓</div>
+                                <div class="text-xs text-slate-500">被動：幸運值 UP</div>
+                            </div>
+                        </div>
+                        <button onclick="buySkin('gold', 100000)" id="btn-skin-gold" class="bg-slate-700 text-xs px-3 py-2 rounded text-white border border-slate-600">100k</button>
+                    </div>
+                    
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
+                                <div class="w-6 h-6 bg-orange-400 rounded skin-hacker"></div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-green-400">駭客任務貓</div>
+                                <div class="text-xs text-slate-500">被動：自動代碼</div>
+                            </div>
+                        </div>
+                        <button onclick="buySkin('hacker', 500000)" id="btn-skin-hacker" class="bg-slate-700 text-xs px-3 py-2 rounded text-white border border-slate-600">500k</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁面 4: 賭場 (Lucky) -->
+        <div id="page-lucky" class="page-content hidden p-4 flex flex-col items-center">
+            <h2 class="text-2xl font-bold text-center mb-2 text-purple-400 font-['Press_Start_2P'] uppercase">每日輪盤</h2>
+            <p class="text-xs text-slate-400 mb-8 text-center">每天免費一抽，拼人品爆擊 SOL</p>
+            
+            <div class="relative mb-8">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-container" id="wheel">
+                    <!-- 輪盤將由 JS 動態填充 -->
+                </div>
+                <!-- 中心點 -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full border-4 border-slate-200 z-10 shadow-lg flex items-center justify-center">
+                    <span class="text-slate-900 font-bold text-xs">0x</span>
+                </div>
+            </div>
+
+            <button id="spin-btn" onclick="spinWheel()" class="w-full max-w-xs bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-xl shadow-lg border-b-4 border-purple-900 active:border-b-0 active:translate-y-1 transition text-xl">
+                SPIN !
+            </button>
+            <p id="spin-result" class="mt-4 font-bold text-yellow-400 min-h-[24px]"></p>
+        </div>
+
+    </main>
+
+    <!-- 底部導航欄 -->
+    <nav class="fixed bottom-0 w-full bg-slate-900 border-t border-slate-800 flex justify-around items-center py-2 pb-4 z-50 shadow-2xl">
+        <button onclick="switchPage('home')" class="nav-btn active flex flex-col items-center gap-1 w-1/5 text-yellow-500">
+            <i class="fa-solid fa-gavel text-xl"></i>
+            <span class="text-[10px]">挖礦</span>
         </button>
-    </div>
-
-    <!-- === 頁面 2: 排行榜 === -->
-    <div id="view-leaderboard" class="page p-6 overflow-y-auto no-scrollbar">
-        <div class="text-center mb-6">
-            <h2 class="text-xl text-white mb-1">HALL OF FAME</h2>
-            <p class="text-[10px] text-gray-500">Top Fat Cats</p>
-        </div>
-        <div class="bg-gray-800 border-2 border-white p-4 mb-4 flex items-center justify-between shadow-[4px_4px_0_0_#000]">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-black font-bold border-2 border-white">YOU</div>
-                <div><div class="text-xs text-white">PLAYER_1</div><div class="text-[10px] text-yellow-400" id="lb-your-score">0 CHONK</div></div>
+        <button onclick="switchPage('earn')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-slate-500 hover:text-white transition">
+            <i class="fa-solid fa-list-check text-xl"></i>
+            <span class="text-[10px]">任務</span>
+        </button>
+        <button onclick="switchPage('lucky')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-slate-500 hover:text-white transition">
+            <div class="relative">
+                <i class="fa-solid fa-dice text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
             </div>
-            <div class="text-xl font-bold text-gray-500">#999+</div>
-        </div>
-        <div class="space-y-2" id="leaderboard-list"></div>
-    </div>
+            <span class="text-[10px]">轉盤</span>
+        </button>
+        <button onclick="switchPage('shop')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-slate-500 hover:text-white transition">
+            <i class="fa-solid fa-shop text-xl"></i>
+            <span class="text-[10px]">商店</span>
+        </button>
+    </nav>
 
-    <!-- === 頁面 3: 任務 === -->
-    <div id="view-earn" class="page p-6 overflow-y-auto no-scrollbar">
-        <h2 class="text-xl text-white text-center mb-6">SOCIAL TASKS</h2>
-        <div class="space-y-4 w-full max-w-md mx-auto">
-            <div class="bg-gray-800 border-2 border-white p-3 shadow-[4px_4px_0_0_#000] relative group">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-black border-2 border-white flex items-center justify-center shrink-0"><i data-lucide="twitter" class="text-blue-400 w-5 h-5"></i></div>
-                    <div class="flex-1"><div class="text-[10px] text-white mb-1">Follow on X</div><div class="text-[10px] text-yellow-400">+5,000 CHONK</div></div>
-                    <button id="btn-twitter" onclick="handleTask('twitter', 'https://x.com/wendan2002', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
-                </div>
-            </div>
-            <div class="bg-gray-800 border-2 border-white p-3 shadow-[4px_4px_0_0_#000] relative group">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-black border-2 border-white flex items-center justify-center shrink-0"><i data-lucide="send" class="text-blue-300 w-5 h-5"></i></div>
-                    <div class="flex-1"><div class="text-[10px] text-white mb-1">Join Community</div><div class="text-[10px] text-yellow-400">+5,000 CHONK</div></div>
-                    <button id="btn-telegram" onclick="handleTask('telegram', 'https://t.me/zeroxchonk', 5000)" class="bg-yellow-400 text-black text-[10px] px-3 py-2 border-b-4 border-yellow-600 active:border-0 active:translate-y-1 font-bold">GO</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 底部導航 -->
-    <div class="h-20 bg-gray-800 border-t-4 border-white flex justify-around items-center px-2 shrink-0 z-20">
-        <button onclick="switchTab('mine')" class="nav-btn flex flex-col items-center gap-1 p-2 text-yellow-400 transition-colors" id="nav-mine"><i data-lucide="pickaxe" class="w-6 h-6"></i><span class="text-[8px]">MINE</span></button>
-        <button onclick="switchTab('leaderboard')" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-500 hover:text-white transition-colors" id="nav-leaderboard"><i data-lucide="trophy" class="w-6 h-6"></i><span class="text-[8px]">RANK</span></button>
-        <button onclick="switchTab('earn')" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-500 hover:text-white transition-colors" id="nav-earn"><i data-lucide="coins" class="w-6 h-6"></i><span class="text-[8px]">EARN</span></button>
-    </div>
-
-    <!-- === [商店彈窗：包含道具與造型] === -->
-    <div id="shop-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-end sm:justify-center p-4">
-        <div class="bg-gray-800 border-4 border-white p-4 w-full max-w-sm shadow-[8px_8px_0_0_#000] relative slide-up max-h-[80vh] overflow-y-auto">
-            <button onclick="toggleShopModal()" class="absolute top-2 right-2 text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h3 class="text-white text-center mb-4 text-sm font-bold">MARKETPLACE</h3>
-            
-            <!-- 分頁按鈕 -->
-            <div class="flex gap-2 mb-4 border-b border-gray-600 pb-2">
-                <button onclick="switchShopTab('upgrades')" id="shop-tab-upgrades" class="flex-1 bg-yellow-400 text-black text-[10px] py-2 font-bold">UPGRADES</button>
-                <button onclick="switchShopTab('skins')" id="shop-tab-skins" class="flex-1 bg-gray-700 text-gray-300 text-[10px] py-2 font-bold hover:bg-gray-600">SKINS</button>
-            </div>
-
-            <!-- 1. 道具分頁 -->
-            <div id="shop-upgrades" class="space-y-3">
-                <div class="bg-gray-900 p-2 border border-gray-600 flex justify-between items-center">
-                    <div class="flex items-center gap-3"><div class="w-8 h-8 bg-blue-900 border border-blue-500 flex items-center justify-center"><i data-lucide="zap" class="text-yellow-400 w-4 h-4"></i></div><div><div class="text-[10px] text-white font-bold">Power Glove</div><div class="text-[8px] text-gray-400">+100 Tap</div></div></div>
-                    <button onclick="buyUpgrade('tap')" class="bg-yellow-400 text-black text-[10px] px-2 py-1 font-bold min-w-[60px] border-b-2 border-yellow-600 active:border-0 active:translate-y-1">Buy <span id="price-tap">500</span></button>
-                </div>
-                <div class="bg-gray-900 p-2 border border-gray-600 flex justify-between items-center">
-                    <div class="flex items-center gap-3"><div class="w-8 h-8 bg-green-900 border border-green-500 flex items-center justify-center"><i data-lucide="battery-charging" class="text-green-400 w-4 h-4"></i></div><div><div class="text-[10px] text-white font-bold">Energy Drink</div><div class="text-[8px] text-gray-400">+500 Max</div></div></div>
-                    <button onclick="buyUpgrade('energy')" class="bg-yellow-400 text-black text-[10px] px-2 py-1 font-bold min-w-[60px] border-b-2 border-yellow-600 active:border-0 active:translate-y-1">Buy <span id="price-energy">1000</span></button>
-                </div>
-            </div>
-
-            <!-- 2. 造型分頁 -->
-            <div id="shop-skins" class="space-y-3 hidden">
-                <div class="bg-gray-900 p-2 border border-gray-600 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-orange-500 rounded-full overflow-hidden border border-white"><img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" class="w-full h-full object-cover"></div><div class="text-[10px] text-white font-bold">Original</div></div><button onclick="equipSkin('default')" class="bg-gray-600 text-white text-[10px] px-2 py-1 font-bold rounded">EQUIP</button></div>
-                <div class="bg-gray-900 p-2 border border-yellow-500 flex justify-between items-center relative overflow-hidden"><div class="absolute inset-0 bg-yellow-500/10"></div><div class="flex items-center gap-3 relative z-10"><div class="w-8 h-8 bg-yellow-400 rounded-full overflow-hidden border border-white"><img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" class="w-full h-full object-cover skin-gold"></div><div><div class="text-[10px] text-yellow-400 font-bold">GOLDEN CAT</div><div class="text-[8px] text-gray-400">Sepia Filter</div></div></div><button id="btn-buy-gold" onclick="buySkin('gold', 10000)" class="bg-yellow-400 text-black text-[10px] px-2 py-1 font-bold border-b-2 border-yellow-600 active:border-0 active:translate-y-1">10k</button></div>
-                <div class="bg-gray-900 p-2 border border-cyan-500 flex justify-between items-center relative overflow-hidden"><div class="absolute inset-0 bg-cyan-500/10"></div><div class="flex items-center gap-3 relative z-10"><div class="w-8 h-8 bg-black rounded-full overflow-hidden border border-cyan-400"><img src="https://github.com/wendan2002/0xChonk/blob/main/0xchonk.jpg.jpg?raw=true" class="w-full h-full object-cover skin-cyber"></div><div><div class="text-[10px] text-cyan-400 font-bold">CYBER CAT</div><div class="text-[8px] text-gray-400">Glitch Effect</div></div></div><button id="btn-buy-cyber" onclick="buySkin('cyber', 50000)" class="bg-cyan-500 text-black text-[10px] px-2 py-1 font-bold border-b-2 border-cyan-700 active:border-0 active:translate-y-1">50k</button></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === [幸運轉盤彈窗] === -->
-    <div id="spin-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-center p-4">
-        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-xs shadow-[8px_8px_0_0_#000] relative text-center">
-            <button onclick="toggleSpinModal()" class="absolute top-2 right-2 text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            <h3 class="text-white text-lg mb-4 font-bold">DAILY SPIN</h3>
-            
-            <div class="relative w-48 h-48 mx-auto mb-6">
-                <!-- 指針 -->
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[20px] border-t-white z-20 drop-shadow-md"></div>
-                <!-- 轉盤 -->
-                <div id="wheel" class="w-full h-full rounded-full border-4 border-white overflow-hidden shadow-lg" 
-                     style="background: conic-gradient(#facc15 0% 10%, #fb923c 10% 25%, #f87171 25% 45%, #60a5fa 45% 75%, #4ade80 75% 100%);">
-                     <div class="absolute inset-0 rounded-full border-4 border-black/20"></div>
-                </div>
-            </div>
-
-            <div id="spin-result" class="text-sm text-white h-6 mb-4 font-bold">Try your luck!</div>
-            <button id="btn-spin" onclick="spinWheel()" class="w-full bg-purple-600 text-white py-3 border-b-4 border-purple-800 active:border-0 active:translate-y-1 font-bold text-xs shadow-lg">SPIN NOW (Free)</button>
-            <p class="text-[8px] text-gray-500 mt-2">Refreshes every 24h</p>
-        </div>
-    </div>
-
-    <!-- 錢包彈窗 -->
-    <div id="wallet-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-center p-4">
-        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-xs shadow-[8px_8px_0_0_#000] relative">
-            <button onclick="toggleWalletModal()" class="absolute top-2 right-2 text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            <h3 class="text-white text-center mb-6 text-sm">CONNECT WALLET</h3>
-            <div class="space-y-3">
-                <button onclick="simulateConnect('Phantom')" class="w-full bg-purple-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-purple-800 transition-colors"><div class="w-8 h-8 bg-purple-500 rounded-full"></div><span class="text-xs text-white">Phantom</span></button>
-                <button onclick="simulateConnect('Metamask')" class="w-full bg-orange-900 border-2 border-white p-3 flex items-center gap-3 hover:bg-orange-800 transition-colors"><div class="w-8 h-8 bg-orange-500 rounded-full"></div><span class="text-xs text-white">Metamask</span></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 每日簽到彈窗 -->
-    <div id="daily-modal" class="fixed inset-0 modal-bg z-50 hidden flex-col items-center justify-center p-4">
-        <div class="bg-gray-800 border-4 border-white p-6 w-full max-w-sm shadow-[8px_8px_0_0_#000] relative pop-in text-center">
-            <div class="text-4xl mb-4 animate-bounce">🎁</div>
-            <h3 class="text-white text-lg mb-2 font-bold">DAILY REWARD</h3>
-            <p class="text-xs text-gray-400 mb-6">Come back every day to earn more!</p>
-            <div class="bg-gray-900 border-2 border-gray-600 p-4 mb-6 rounded-lg"><div class="text-xs text-gray-400 mb-1">REWARD</div><div class="text-2xl text-yellow-400 font-bold">+5,000 CHONK</div></div>
-            <button onclick="claimDaily()" class="w-full bg-green-500 text-white py-3 border-b-4 border-green-700 active:border-0 active:translate-y-1 font-bold text-xs shadow-lg">CLAIM REWARD</button>
-        </div>
-    </div>
-
+    <!-- JavaScript 邏輯 -->
     <script>
-        lucide.createIcons();
+        // --- 遊戲數據結構 ---
+        const defaultState = {
+            score: 0,
+            level: 1,
+            energy: 1000,
+            maxEnergy: 1000,
+            clickPower: 1,
+            lastLogin: Date.now(),
+            tasks: { twitter: false, telegram: false, daily: 0 },
+            upgrades: { click: 1, energy: 1 },
+            skins: ['default'],
+            currentSkin: 'default',
+            lastSpin: 0
+        };
 
-        // 核心數據
-        let score = parseInt(localStorage.getItem('chonk_score')) || 0;
-        let tapLevel = parseInt(localStorage.getItem('chonk_tap_lvl')) || 1;
-        let energyLevel = parseInt(localStorage.getItem('chonk_energy_lvl')) || 1;
-        let walletAddress = localStorage.getItem('chonk_wallet');
-        let lastLogin = localStorage.getItem('chonk_last_login');
-        let ownedSkins = JSON.parse(localStorage.getItem('chonk_skins')) || ['default'];
-        let currentSkin = localStorage.getItem('chonk_current_skin') || 'default';
-        let lastSpin = localStorage.getItem('chonk_last_spin');
+        let gameState = JSON.parse(localStorage.getItem('0xChonk_v1.8')) || defaultState;
 
-        let pointsPerTap = 100 * tapLevel;
-        let maxEnergy = 1000 + (energyLevel - 1) * 500;
-        let energy = maxEnergy; 
-        let tapPrice = 500 * Math.pow(2, tapLevel - 1);
-        let energyPrice = 1000 * Math.pow(2, energyLevel - 1);
+        // --- 核心變數 ---
+        const levelThresholds = [0, 5000, 20000, 100000, 500000, 1000000];
+        let energyInterval;
 
-        const scoreDisplay = document.getElementById('score-display');
-        const ppcDisplay = document.getElementById('ppc-display');
-        const energyBar = document.getElementById('energy-bar');
-        const energyText = document.getElementById('energy-text');
-        const catBtn = document.getElementById('cat-btn');
-        const catImg = document.getElementById('cat-img');
+        // --- 初始化 ---
+        function init() {
+            calculateOfflineEnergy();
+            updateUI();
+            startEnergyRegen();
+            applySkin(gameState.currentSkin);
+            renderWheel(); // 雖然是CSS轉盤，但這裡預留做邏輯
+            
+            // 檢查是否換日重置每日簽到
+            const today = new Date().setHours(0,0,0,0);
+            if(gameState.tasks.daily < today) {
+                document.getElementById('btn-daily-checkin').classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('btn-daily-checkin').innerText = '領取';
+                document.getElementById('btn-daily-checkin').onclick = dailyCheckIn;
+            } else {
+                markDailyClaimed();
+            }
 
-        // 開場動畫 & 初始化
-        window.addEventListener('load', () => {
-            const loadingBar = document.getElementById('loading-fill');
-            const loadingText = document.getElementById('loading-text');
-            const screen = document.getElementById('loading-screen');
-            setTimeout(() => { loadingBar.style.width = '30%'; }, 200);
-            setTimeout(() => { loadingBar.style.width = '70%'; loadingText.innerText = "CONNECTING SOLANA..."; }, 800);
-            setTimeout(() => { loadingBar.style.width = '100%'; loadingText.innerText = "WAKING UP CAT..."; }, 1500);
-            setTimeout(() => { 
-                screen.style.opacity = '0'; 
-                setTimeout(() => screen.remove(), 500); 
-                checkDailyReward(); // 開場後檢查簽到
-                checkSpinAvailable(); // 檢查轉盤
-            }, 2200);
+            // 更新按鈕狀態
+            checkTaskStatus();
+            updateShopUI();
+        }
+
+        // --- 存檔系統 ---
+        function saveGame() {
+            localStorage.setItem('0xChonk_v1.8', JSON.stringify(gameState));
+        }
+
+        // --- 離線收益/能量計算 ---
+        function calculateOfflineEnergy() {
+            const now = Date.now();
+            const diff = (now - gameState.lastLogin) / 1000; // 秒
+            const regenAmount = Math.floor(diff * 1); // 每秒回1點
+            gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + regenAmount);
+            gameState.lastLogin = now;
+            saveGame();
+        }
+
+        // --- 能量回復循環 ---
+        function startEnergyRegen() {
+            clearInterval(energyInterval);
+            energyInterval = setInterval(() => {
+                if (gameState.energy < gameState.maxEnergy) {
+                    gameState.energy += 1; // 基礎回復
+                    updateUI();
+                    saveGame();
+                }
+            }, 1000); // 每秒
+        }
+
+        // --- 點擊核心邏輯 ---
+        const clickZone = document.getElementById('click-zone');
+        
+        clickZone.addEventListener('pointerdown', (e) => {
+            // 防止縮放
+            e.preventDefault();
+
+            if (gameState.energy >= gameState.clickPower) {
+                // 1. 震動反饋 (Haptic)
+                if (navigator.vibrate) navigator.vibrate(10);
+
+                // 2. 扣除能量 & 增加分數
+                gameState.energy -= gameState.clickPower;
+                
+                // 爆擊判定 (10%機率 3倍)
+                let isCrit = Math.random() < 0.1;
+                let gain = isCrit ? gameState.clickPower * 3 : gameState.clickPower;
+                
+                gameState.score += gain;
+
+                // 3. 浮動數字
+                createFloatingText(e.clientX, e.clientY, gain, isCrit);
+
+                // 4. 更新 UI & 存檔
+                checkLevelUp();
+                updateUI();
+                
+                // 簡單防刷 (每10次存一次，減少IO)
+                if(Math.random() < 0.1) saveGame();
+            } else {
+                // 沒能量時的 UI 反饋
+                clickZone.classList.add('grayscale');
+                setTimeout(() => clickZone.classList.remove('grayscale'), 200);
+            }
         });
 
-        if(walletAddress) updateWalletUI(walletAddress);
-        updateUI();
-        initLeaderboard();
-        applySkin(currentSkin);
-        updateSkinButtons();
+        function createFloatingText(x, y, amount, isCrit) {
+            const el = document.createElement('div');
+            el.className = 'float-number text-2xl ' + (isCrit ? 'text-red-500 text-4xl' : 'text-white');
+            el.innerText = isCrit ? `🔥 +${amount}` : `+${amount}`;
+            
+            // 隨機偏移一點
+            const offsetX = (Math.random() - 0.5) * 40;
+            
+            el.style.left = `${x + offsetX}px`;
+            el.style.top = `${y - 50}px`;
+            
+            document.body.appendChild(el);
+            
+            setTimeout(() => el.remove(), 800);
+        }
 
-        // --- 1. 點擊 & 爆擊 (Crit) ---
-        catBtn.addEventListener('mousedown', handleTap);
-        catBtn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e.touches[0]); });
+        function checkLevelUp() {
+            // 簡單等級邏輯
+            if (gameState.score > levelThresholds[gameState.level]) {
+                gameState.level++;
+                // 升級特效可在此添加
+                alert(`恭喜！肥貓升級到了 Lv.${gameState.level}`);
+            }
+        }
 
-        function handleTap(e) {
-            if (energy < 10) return;
-            energy -= 10;
-            // 8% 爆擊機率
-            let isCrit = Math.random() < 0.08;
-            let finalPoints = isCrit ? pointsPerTap * 5 : pointsPerTap;
-            score += finalPoints;
-            saveData();
+        // --- UI 更新 ---
+        function updateUI() {
+            document.getElementById('score-display').innerText = gameState.score.toLocaleString();
+            document.getElementById('energy-current').innerText = Math.floor(gameState.energy);
+            document.getElementById('energy-max').innerText = gameState.maxEnergy;
+            document.getElementById('level-display').innerText = gameState.level;
+            
+            const pct = (gameState.energy / gameState.maxEnergy) * 100;
+            document.getElementById('energy-bar').style.width = `${pct}%`;
+        }
+
+        // --- 頁面切換 ---
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            
+            // 更新按鈕樣式
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-yellow-500');
+                btn.classList.add('text-slate-500');
+            });
+            event.currentTarget.classList.remove('text-slate-500');
+            event.currentTarget.classList.add('text-yellow-500');
+        }
+
+        // --- 任務系統 ---
+        function completeTask(taskId, reward, url) {
+            if (url && url !== '#') window.open(url, '_blank');
+            
+            if (!gameState.tasks[taskId]) {
+                setTimeout(() => {
+                    // 模擬驗證時間
+                    gameState.tasks[taskId] = true;
+                    gameState.score += reward;
+                    saveGame();
+                    updateUI();
+                    checkTaskStatus();
+                    alert(`任務完成！獲得 ${reward} Pts`);
+                }, 2000);
+            } else {
+                alert('這個任務已經做過了喵！');
+            }
+        }
+
+        function checkTaskStatus() {
+            if(gameState.tasks.twitter) {
+                const btn = document.getElementById('btn-task-twitter');
+                btn.innerText = "已完成";
+                btn.classList.add('opacity-50', 'bg-green-600');
+                btn.disabled = true;
+            }
+            if(gameState.tasks.telegram) {
+                const btn = document.getElementById('btn-task-telegram');
+                btn.innerText = "已完成";
+                btn.classList.add('opacity-50', 'bg-green-600');
+                btn.disabled = true;
+            }
+        }
+
+        function dailyCheckIn() {
+            gameState.score += 1000;
+            gameState.tasks.daily = new Date().setHours(23,59,59,999); // 設為今天結束
+            saveGame();
             updateUI();
-            
-            // 貓咪動作
-            const container = catBtn.querySelector('div');
-            container.classList.remove('cat-idle'); container.style.animation = 'none'; container.offsetHeight; container.style.animation = null; container.classList.add('cat-tap');
-            
-            // 爆擊震動
-            if(isCrit) { document.body.classList.add('crit-shake'); setTimeout(() => document.body.classList.remove('crit-shake'), 200); }
-            setTimeout(() => { container.classList.remove('cat-tap'); container.classList.add('cat-idle'); }, 100);
-            
-            const rect = catBtn.getBoundingClientRect();
-            const x = e.clientX || (rect.left + rect.width/2);
-            const y = e.clientY || (rect.top + rect.height/2);
-            showFloatingText(x, y, `+${finalPoints}`, isCrit);
-            if (navigator.vibrate) navigator.vibrate(isCrit ? 50 : 15);
+            markDailyClaimed();
+            alert("簽到成功！+1000");
         }
 
-        // --- 2. 轉盤系統 (Spin) ---
-        function toggleSpinModal() { document.getElementById('spin-modal').classList.toggle('hidden'); document.getElementById('spin-modal').classList.toggle('flex'); checkSpinAvailable(); }
-        function checkSpinAvailable() {
-            const now = new Date().toDateString();
-            const badge = document.getElementById('spin-badge');
-            const btn = document.getElementById('btn-spin');
-            if (lastSpin !== now) { badge.classList.remove('hidden'); btn.disabled = false; btn.innerText = "SPIN NOW (Free)"; btn.classList.replace('bg-gray-600', 'bg-purple-600'); } 
-            else { badge.classList.add('hidden'); btn.disabled = true; btn.innerText = "COME BACK TOMORROW"; btn.classList.replace('bg-purple-600', 'bg-gray-600'); btn.classList.replace('border-purple-800', 'border-gray-800'); }
+        function markDailyClaimed() {
+            const btn = document.getElementById('btn-daily-checkin');
+            btn.innerText = '明日再來';
+            btn.onclick = null;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
         }
+
+        function copyInvite() {
+            navigator.clipboard.writeText("https://t.me/ChonkBot?start=ref_USERID");
+            alert("邀請連結已複製！去轟炸群組吧！");
+        }
+
+        // --- 商店系統 ---
+        function updateShopUI() {
+            // 基礎價格公式
+            const clickCost = Math.floor(500 * Math.pow(1.5, gameState.upgrades.click));
+            const energyCost = Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy));
+            
+            document.getElementById('cost-click').innerText = clickCost + ' Pts';
+            document.getElementById('lvl-click').innerText = gameState.upgrades.click;
+            
+            document.getElementById('cost-energy').innerText = energyCost + ' Pts';
+            document.getElementById('lvl-energy').innerText = gameState.upgrades.energy;
+
+            // 造型按鈕狀態
+            if(gameState.skins.includes('gold')) {
+                const btn = document.getElementById('btn-skin-gold');
+                if(gameState.currentSkin === 'gold') {
+                    btn.innerText = "使用中";
+                    btn.className = "bg-green-600 text-xs px-3 py-2 rounded text-white";
+                } else {
+                    btn.innerText = "裝備";
+                    btn.onclick = () => equipSkin('gold');
+                    btn.className = "bg-blue-600 text-xs px-3 py-2 rounded text-white";
+                }
+            }
+            if(gameState.skins.includes('hacker')) {
+                const btn = document.getElementById('btn-skin-hacker');
+                if(gameState.currentSkin === 'hacker') {
+                    btn.innerText = "使用中";
+                    btn.className = "bg-green-600 text-xs px-3 py-2 rounded text-white";
+                } else {
+                    btn.innerText = "裝備";
+                    btn.onclick = () => equipSkin('hacker');
+                    btn.className = "bg-blue-600 text-xs px-3 py-2 rounded text-white";
+                }
+            }
+        }
+
+        function buyUpgrade(type) {
+            let cost = 0;
+            if (type === 'click') {
+                cost = Math.floor(500 * Math.pow(1.5, gameState.upgrades.click));
+                if (gameState.score >= cost) {
+                    gameState.score -= cost;
+                    gameState.upgrades.click++;
+                    gameState.clickPower++; // 簡單 +1
+                    saveGame();
+                    updateUI();
+                    updateShopUI();
+                    alert("升級成功！點擊力 UP！");
+                } else {
+                    alert("窮鬼！錢不夠喵！");
+                }
+            } else if (type === 'energy') {
+                cost = Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy));
+                if (gameState.score >= cost) {
+                    gameState.score -= cost;
+                    gameState.upgrades.energy++;
+                    gameState.maxEnergy += 500;
+                    gameState.energy = gameState.maxEnergy; // 補滿
+                    saveGame();
+                    updateUI();
+                    updateShopUI();
+                    alert("升級成功！體力上限 UP！");
+                } else {
+                    alert("窮鬼！錢不夠喵！");
+                }
+            }
+        }
+
+        function buySkin(skinId, price) {
+            if (gameState.skins.includes(skinId)) return; // 已擁有
+            
+            if (gameState.score >= price) {
+                gameState.score -= price;
+                gameState.skins.push(skinId);
+                saveGame();
+                updateUI();
+                updateShopUI(); // 更新按鈕狀態
+                alert("購買成功！去裝備吧！");
+            } else {
+                alert("錢不夠！快去挖礦！");
+            }
+        }
+
+        function equipSkin(skinId) {
+            gameState.currentSkin = skinId;
+            applySkin(skinId);
+            saveGame();
+            updateShopUI();
+        }
+
+        function applySkin(skinId) {
+            const avatar = document.getElementById('cat-avatar');
+            // 移除所有舊 skin class
+            avatar.classList.remove('skin-default', 'skin-gold', 'skin-hacker', 'skin-neon');
+            // 加入新的
+            avatar.classList.add(`skin-${skinId}`);
+        }
+
+        // --- 轉盤邏輯 (CSS + JS) ---
+        let isSpinning = false;
+        
         function spinWheel() {
+            if (isSpinning) return;
+            
+            // 檢查冷卻 (24小時) - 這裡為了測試方便設為 60秒
+            const now = Date.now();
+            if (now - gameState.lastSpin < 60000) { 
+                const wait = Math.ceil((60000 - (now - gameState.lastSpin))/1000);
+                alert(`還在冷卻中！請等待 ${wait} 秒`);
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById('spin-result').innerText = "";
+            
+            // 隨機角度: 至少轉5圈 (1800度) + 隨機角度
+            const extraDeg = Math.floor(Math.random() * 360);
+            const totalDeg = 1800 + extraDeg; 
+            
             const wheel = document.getElementById('wheel');
-            const resultText = document.getElementById('spin-result');
-            const btn = document.getElementById('btn-spin');
-            btn.disabled = true;
-            const baseSpins = 1800; 
-            const randomDeg = Math.floor(Math.random() * 360);
-            const totalDeg = baseSpins + randomDeg;
+            wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
             wheel.style.transform = `rotate(${totalDeg}deg)`;
-            wheel.classList.add('wheel-container');
+
+            // 計算獎勵 (基於角度)
+            // 8個區塊，每個45度。指針在上方(0度)。
+            // 實際落在的角度 = totalDeg % 360。
+            // 由於盤面順時針轉，指針相對盤面是逆時針掃過。
+            // 簡化邏輯：純隨機給獎勵，動畫只是過場
+            
             setTimeout(() => {
-                let reward = 0; let text = ""; const rand = Math.random();
-                if(rand < 0.05) { reward = 10000; text = "JACKPOT! 10,000 CHONK"; } else if(rand < 0.2) { reward = 5000; text = "BIG WIN! 5,000 CHONK"; } else if(rand < 0.5) { reward = 2000; text = "Nice! 2,000 CHONK"; } else { reward = 500; text = "Small win. 500 CHONK"; }
-                resultText.innerText = text; score += reward;
-                const now = new Date().toDateString(); localStorage.setItem('chonk_last_spin', now); lastSpin = now;
-                saveData(); updateUI(); checkSpinAvailable(); alert(`You won: ${reward} CHONK!`);
-                setTimeout(() => { wheel.style.transition = 'none'; wheel.style.transform = 'rotate(0deg)'; }, 1000);
+                isSpinning = false;
+                gameState.lastSpin = Date.now();
+                
+                // 模擬結果
+                const rewards = [100, 500, 1000, 0, 2000, 5000, 100, 10000];
+                const finalReward = rewards[Math.floor(Math.random() * rewards.length)];
+                
+                if(finalReward > 0) {
+                    gameState.score += finalReward;
+                    document.getElementById('spin-result').innerText = `WIN: ${finalReward} Pts!`;
+                    alert(`恭喜獲得 ${finalReward} 分！`);
+                } else {
+                    document.getElementById('spin-result').innerText = `Bad Luck...`;
+                    alert(`幫QQ，沒中獎...`);
+                }
+                
+                saveGame();
+                updateUI();
+                
+                // 重置轉盤角度 (為了下次動畫) - 實際項目可能需要更複雜的重置邏輯
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(${totalDeg % 360}deg)`;
             }, 4000);
         }
 
-        // --- 3. 商店與造型 (Shop & Skins) ---
-        function toggleShopModal() { const m = document.getElementById('shop-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex'); document.getElementById('price-tap').innerText = tapPrice; document.getElementById('price-energy').innerText = energyPrice; updateSkinButtons(); }
-        function switchShopTab(t) { document.getElementById('shop-upgrades').classList.add('hidden'); document.getElementById('shop-skins').classList.add('hidden'); document.getElementById('shop-tab-upgrades').classList.replace('bg-yellow-400', 'bg-gray-700'); document.getElementById('shop-tab-upgrades').classList.replace('text-black', 'text-gray-300'); document.getElementById('shop-tab-skins').classList.replace('bg-yellow-400', 'bg-gray-700'); document.getElementById('shop-tab-skins').classList.replace('text-black', 'text-gray-300'); document.getElementById(`shop-${t}`).classList.remove('hidden'); document.getElementById(`shop-tab-${t}`).classList.replace('bg-gray-700', 'bg-yellow-400'); document.getElementById(`shop-tab-${t}`).classList.replace('text-gray-300', 'text-black'); }
-        function buyUpgrade(t) { if (t==='tap'){ if(score>=tapPrice){score-=tapPrice;tapLevel++;tapPrice=500*Math.pow(2,tapLevel-1);pointsPerTap=100*tapLevel;alert("Upgraded!");}else{alert("No CHONK!");} } else { if(score>=energyPrice){score-=energyPrice;energyLevel++;energyPrice=1000*Math.pow(2,energyLevel-1);maxEnergy=1000+(energyLevel-1)*500;energy=maxEnergy;alert("Upgraded!");}else{alert("No CHONK!");} } saveData();updateUI();toggleShopModal();toggleShopModal(); }
-        function buySkin(id, p) { if(ownedSkins.includes(id))return; if(score>=p){score-=p;ownedSkins.push(id);alert("Unlocked!");equipSkin(id);saveData();updateUI();updateSkinButtons();}else{alert("No CHONK!");} }
-        function equipSkin(id) { if(!ownedSkins.includes(id))return; currentSkin=id; saveData(); applySkin(id); updateSkinButtons(); }
-        function applySkin(id) { catImg.className="w-full h-full object-cover scale-110 mt-4 transition-all duration-300"; catImg.classList.add(`skin-${id}`); }
-        function updateSkinButtons() { ['gold','cyber'].forEach(id=>{ const b=document.getElementById(`btn-buy-${id}`); if(ownedSkins.includes(id)){ b.innerText=(currentSkin===id)?"EQUIPPED":"EQUIP"; b.onclick=()=>equipSkin(id); b.className=(currentSkin===id)?"bg-green-500 text-white text-[10px] px-2 py-1 font-bold rounded cursor-default":"bg-gray-600 text-white text-[10px] px-2 py-1 font-bold rounded";} }); }
+        // 啟動
+        init();
 
-        // --- 共通 ---
-        function checkDailyReward() { const now = new Date().toDateString(); if (lastLogin !== now) { setTimeout(() => { document.getElementById('daily-modal').classList.remove('hidden'); document.getElementById('daily-modal').classList.add('flex'); }, 1000); } }
-        function claimDaily() { const now = new Date().toDateString(); localStorage.setItem('chonk_last_login', now); score += 5000; saveData(); updateUI(); document.getElementById('daily-modal').classList.add('hidden'); document.getElementById('daily-modal').classList.remove('flex'); alert("Daily Reward Claimed! +5,000 CHONK"); }
-        function initLeaderboard() { const l=document.getElementById('leaderboard-list'); const u=[{n:"Elon_Musk",s:"999M"},{n:"Vitalik",s:"500M"},{n:"Doge_King",s:"100M"}]; u.forEach((x,i)=>{ l.innerHTML+=`<div class="flex justify-between p-3 border-b border-gray-700"><div class="flex gap-3"><div class="${i===0?'text-yellow-400':'text-gray-400'} font-bold">#${i+1}</div><div class="text-xs text-white">${x.n}</div></div><div class="text-xs text-gray-400">${x.s}</div></div>`; }); }
-        function handleTask(id,u,r) { const b=document.getElementById(`btn-${id}`); if(b.disabled)return; window.open(u,'_blank'); b.innerText="VERIFYING..."; b.classList.add('opacity-50'); setTimeout(()=>{ score+=r; saveData(); updateUI(); b.innerText="CLAIMED"; b.disabled=true; b.classList.replace('bg-yellow-400','bg-green-500'); b.classList.replace('border-yellow-600','border-green-700'); b.classList.replace('text-black','text-white'); b.classList.remove('opacity-50'); },3000); }
-        function toggleWalletModal() { const m=document.getElementById('wallet-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function simulateConnect(p) { const b=document.querySelector(`button[onclick="simulateConnect('${p}')"]`); b.innerHTML=`<span class="animate-pulse">Connecting...</span>`; setTimeout(()=>{ const a="0x"+Math.random().toString(16).substr(2,4).toUpperCase()+"...CHONK"; localStorage.setItem('chonk_wallet',a); updateWalletUI(a); toggleWalletModal(); alert("Connected!"); },1500); }
-        function updateWalletUI(a) { const b=document.getElementById('wallet-btn'); const t=document.getElementById('wallet-text'); b.classList.replace('bg-black','bg-green-900'); b.classList.replace('border-gray-600','border-green-500'); t.innerText=a; t.classList.replace('text-gray-400','text-green-300'); }
-        function switchTab(t) { document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); document.getElementById(`view-${t}`).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('text-yellow-400');e.classList.add('text-gray-500')}); document.getElementById(`nav-${t}`).classList.remove('text-gray-500'); document.getElementById(`nav-${t}`).classList.add('text-yellow-400'); }
-        function showFloatingText(x,y,t,c) { const e=document.createElement('div'); e.className=c?'float-num float-crit':'float-num'; e.innerText=c?t+" CRIT!":t; e.style.left=(x+(Math.random()-0.5)*40)+'px'; e.style.top=(y-50)+'px'; document.body.appendChild(e); setTimeout(()=>e.remove(),600); }
-        function updateUI() { scoreDisplay.innerText=score.toLocaleString(); document.getElementById('lb-your-score').innerText=score.toLocaleString(); ppcDisplay.innerText=pointsPerTap; energyText.innerText=Math.floor(energy)+"/"+maxEnergy; energyBar.style.width=(energy/maxEnergy)*100+"%"; document.getElementById('user-level').innerText=tapLevel; }
-        function saveData(a) { localStorage.setItem('chonk_score',score); localStorage.setItem('chonk_tap_lvl',tapLevel); localStorage.setItem('chonk_energy_lvl',energyLevel); localStorage.setItem('chonk_skins',JSON.stringify(ownedSkins)); localStorage.setItem('chonk_current_skin',currentSkin); if(a)alert("Saved!"); }
-        setInterval(()=>{ if(energy<maxEnergy){ energy+=5; if(energy>maxEnergy)energy=maxEnergy; updateUI(); } },1000);
     </script>
 </body>
 </html>
