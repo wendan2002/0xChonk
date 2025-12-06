@@ -21,14 +21,10 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 像素字體用於標題 */
         .pixel-font { font-family: 'Press Start 2P', cursive; }
-
-        /* 胖貓動畫 */
         .cat-bounce { transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .cat-bounce:active { transform: scale(0.9) rotate(-5deg); }
         
-        /* 浮動數字 */
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
             100% { opacity: 0; transform: translateY(-80px) scale(1.5) rotate(15deg); }
@@ -42,17 +38,13 @@
             z-index: 50;
         }
 
-        /* 皮膚濾鏡 */
         .skin-default { filter: none; }
         .skin-gold { filter: drop-shadow(0 0 15px gold) brightness(1.1) sepia(1) saturate(3); }
         .skin-hacker { filter: drop-shadow(0 0 8px #0f0) hue-rotate(90deg) contrast(1.5); }
-        .skin-neon { filter: drop-shadow(0 0 10px #f0f) hue-rotate(280deg) invert(0.1); }
 
-        /* 隱藏滾動條但保留功能 */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 轉盤樣式 */
         .wheel-container {
             position: relative;
             width: 280px;
@@ -105,7 +97,6 @@
         
         <!-- === 頁面 1: 首頁 (Home) === -->
         <div id="page-home" class="page-content h-full flex flex-col items-center pt-8">
-            
             <!-- 能量條 -->
             <div class="w-4/5 max-w-sm mb-8 bg-slate-800 border-2 border-slate-950 rounded-full p-1.5 shadow-lg relative">
                 <div class="flex justify-between px-2 mb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest z-10 relative">
@@ -122,24 +113,17 @@
             <!-- 貓咪互動區 -->
             <div class="relative w-72 h-72 flex items-center justify-center cursor-pointer select-none" id="click-zone">
                 <div class="absolute inset-0 bg-orange-500 blur-[80px] opacity-20 rounded-full animate-pulse"></div>
-                
-                <!-- SVG 貓咪 -->
                 <div id="cat-avatar" class="cat-bounce w-full h-full relative z-10 filter drop-shadow-2xl">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                         <g>
-                            <!-- 尾巴 -->
                             <path d="M150,140 Q180,110 170,160" stroke="#ea580c" stroke-width="12" fill="none" class="animate-pulse"/>
-                            <!-- 身體 -->
                             <rect x="40" y="60" width="120" height="110" rx="45" fill="#f97316" stroke="#431407" stroke-width="3" />
                             <ellipse cx="100" cy="125" rx="45" ry="38" fill="#ffedd5" />
-                            <!-- 耳朵 -->
                             <path d="M50,70 L30,25 L80,60" fill="#f97316" stroke="#431407" stroke-width="3" />
                             <path d="M150,70 L170,25 L120,60" fill="#f97316" stroke="#431407" stroke-width="3" />
-                            <!-- 臉 -->
                             <circle cx="70" cy="90" r="8" fill="#0f172a" />
                             <circle cx="130" cy="90" r="8" fill="#0f172a" />
                             <path d="M95,105 Q100,110 105,105" fill="none" stroke="#431407" stroke-width="3" />
-                            <!-- 斑紋 -->
                             <path d="M90,60 L110,60 L100,75 Z" fill="#c2410c" />
                             <rect x="40" y="100" width="12" height="25" rx="5" fill="#c2410c" opacity="0.8"/>
                             <rect x="148" y="100" width="12" height="25" rx="5" fill="#c2410c" opacity="0.8"/>
@@ -147,16 +131,13 @@
                     </svg>
                 </div>
             </div>
-            
-            <div class="mt-8 text-center animate-bounce text-slate-500 text-xs font-bold uppercase tracking-widest">
-                TAP TO FEED
-            </div>
+            <div class="mt-8 text-center animate-bounce text-slate-500 text-xs font-bold uppercase tracking-widest">TAP TO FEED</div>
         </div>
 
         <!-- === 頁面 2: 賺取 (Earn) === -->
         <div id="page-earn" class="page-content hidden p-4 space-y-6">
             
-            <!-- 1. 每日連續簽到 (增強版) -->
+            <!-- 每日連續簽到 -->
             <div class="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl p-5 border border-slate-700 shadow-xl">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-black text-yellow-500 flex items-center gap-2">
@@ -164,61 +145,58 @@
                     </h3>
                     <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300" id="daily-timer">Reset in 12h</span>
                 </div>
-                
-                <!-- 橫向滾動簽到條 -->
                 <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="daily-container">
                     <!-- JS 生成 -->
                 </div>
-
                 <button id="btn-claim-daily" onclick="claimDaily()" class="w-full mt-2 bg-yellow-500 hover:bg-yellow-400 text-black font-black py-3 rounded-xl shadow-[0_4px_0_rgb(161,98,7)] active:shadow-none active:translate-y-1 transition-all">
                     CLAIM REWARD
                 </button>
             </div>
 
-            <!-- 2. 任務列表 -->
+            <!-- 任務列表 (已更新您的連結) -->
             <div>
-                <h3 class="font-black text-slate-300 text-sm mb-3 px-1 uppercase">Social Bounties</h3>
+                <h3 class="font-black text-slate-300 text-sm mb-3 px-1 uppercase">Official Tasks</h3>
                 <div class="space-y-3" id="task-list">
-                    <!-- 任務項目 HTML 範本 -->
+                    
+                    <!-- X (Twitter) Task -->
                     <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between active:bg-slate-700 transition">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
-                                <i class="fa-brands fa-twitter"></i>
+                                <i class="fa-brands fa-x-twitter"></i>
                             </div>
                             <div>
-                                <div class="font-bold text-sm">Follow on X</div>
+                                <div class="font-bold text-sm">Follow wendan2002</div>
                                 <div class="text-xs text-yellow-500 font-bold">+5,000 Pts</div>
                             </div>
                         </div>
                         <button onclick="doTask('twitter')" id="btn-twitter" class="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-lg">Go</button>
                     </div>
-                    <!-- 更多任務... -->
+
+                    <!-- Telegram Task -->
                     <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between active:bg-slate-700 transition">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-500">
                                 <i class="fa-brands fa-telegram"></i>
                             </div>
                             <div>
-                                <div class="font-bold text-sm">Join TG Channel</div>
+                                <div class="font-bold text-sm">Join Announcement</div>
                                 <div class="text-xs text-yellow-500 font-bold">+5,000 Pts</div>
                             </div>
                         </div>
                         <button onclick="doTask('telegram')" id="btn-telegram" class="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-lg">Go</button>
                     </div>
+
                 </div>
             </div>
 
-            <!-- 3. 邀請卡片 (病毒核心) -->
+            <!-- 邀請卡片 -->
             <div class="bg-indigo-900/50 border border-indigo-500/30 rounded-2xl p-5 text-center relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500 blur-[60px] opacity-30"></div>
-                
                 <div class="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg border-4 border-indigo-400">
                     <i class="fa-solid fa-users text-2xl text-white"></i>
                 </div>
-                
                 <h3 class="text-xl font-black mb-1">CHONK SQUAD</h3>
                 <p class="text-xs text-indigo-200 mb-4 px-4">Invite friends. You get <span class="text-white font-bold">10%</span> of their earnings forever.</p>
-                
                 <div class="grid grid-cols-2 gap-2 mb-4">
                     <div class="bg-slate-900/50 p-2 rounded-lg">
                         <div class="text-[10px] text-slate-400 uppercase">Friends</div>
@@ -229,27 +207,22 @@
                         <div class="text-lg font-black text-yellow-400" id="referral-earned">0</div>
                     </div>
                 </div>
-
                 <button onclick="copyInvite()" class="w-full bg-white text-indigo-900 font-black py-3 rounded-xl shadow-[0_4px_0_#c7d2fe] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2">
                     <i class="fa-regular fa-copy"></i> COPY LINK
                 </button>
             </div>
         </div>
 
-        <!-- === 頁面 3: 空投 (Airdrop) - 新增! === -->
+        <!-- === 頁面 3: 空投 (Airdrop) === -->
         <div id="page-airdrop" class="page-content hidden p-6 flex flex-col items-center justify-center h-full pb-32">
             <div class="w-32 h-32 bg-slate-800 rounded-full flex items-center justify-center mb-6 relative border-4 border-slate-700 shadow-2xl">
                 <i class="fa-solid fa-parachute-box text-5xl text-slate-500"></i>
-                <div class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce border-2 border-slate-900">
-                    SOON
-                </div>
+                <div class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce border-2 border-slate-900">SOON</div>
             </div>
-            
             <h2 class="text-2xl font-black mb-2 pixel-font text-white">$CHONK</h2>
             <p class="text-slate-400 text-sm text-center mb-8 max-w-xs leading-relaxed">
                 Listing is approaching.<br>Keep feeding your cat to maximize your allocation.
             </p>
-
             <div class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
                 <div class="flex justify-between text-xs font-bold mb-2">
                     <span class="text-slate-400">Listing Progress</span>
@@ -260,7 +233,6 @@
                         <div class="absolute top-0 left-0 w-full h-full bg-white opacity-20 animate-[pulse_2s_infinite]"></div>
                     </div>
                 </div>
-                
                 <div class="pt-4 border-t border-slate-700">
                     <button class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-[0_4px_0_#1e3a8a] active:shadow-none active:translate-y-1 transition">
                         <i class="fa-solid fa-wallet"></i> Connect Wallet
@@ -272,35 +244,21 @@
         <!-- === 頁面 4: 轉盤 (Lucky) === -->
         <div id="page-lucky" class="page-content hidden p-4 flex flex-col items-center justify-center h-full pb-20">
             <h2 class="text-xl font-black text-purple-400 mb-6 pixel-font">LUCKY WHEEL</h2>
-            
             <div class="relative mb-8">
-                <!-- 指針 -->
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-20 text-white drop-shadow-md">
-                    <i class="fa-solid fa-caret-down text-4xl"></i>
-                </div>
-                
-                <div class="wheel-container" id="wheel">
-                    <!-- 轉盤 CSS 負責顏色，這裡可以用 JS 塞圖標，目前純色塊 -->
-                </div>
-                
-                <!-- 中心按鈕 -->
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-20 text-white drop-shadow-md"><i class="fa-solid fa-caret-down text-4xl"></i></div>
+                <div class="wheel-container" id="wheel"></div>
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white rounded-full border-4 border-slate-200 z-10 shadow-lg flex items-center justify-center">
                     <span class="text-slate-900 font-black text-lg">0x</span>
                 </div>
             </div>
-
-            <button id="spin-btn" onclick="spinWheel()" class="w-64 bg-purple-600 text-white font-black py-4 rounded-xl shadow-[0_6px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all text-xl tracking-widest">
-                SPIN!
-            </button>
+            <button id="spin-btn" onclick="spinWheel()" class="w-64 bg-purple-600 text-white font-black py-4 rounded-xl shadow-[0_6px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all text-xl tracking-widest">SPIN!</button>
             <p id="spin-result" class="mt-4 font-bold text-yellow-400 h-6"></p>
         </div>
 
         <!-- === 頁面 5: 商店 (Shop) === -->
         <div id="page-shop" class="page-content hidden p-4 pb-24">
             <h2 class="text-xl font-black text-yellow-400 mb-6 pixel-font text-center">BLACK MARKET</h2>
-            
             <div class="space-y-6">
-                <!-- 道具 -->
                 <div>
                     <h3 class="text-xs text-slate-500 uppercase tracking-widest font-bold mb-3">Boosters</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -318,8 +276,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- 造型 -->
                 <div>
                     <h3 class="text-xs text-slate-500 uppercase tracking-widest font-bold mb-3">Skins (NFT)</h3>
                     <div class="space-y-3">
@@ -335,7 +291,6 @@
                             </div>
                             <button onclick="buySkin('gold', 50000)" id="btn-skin-gold" class="bg-slate-700 text-[10px] font-bold px-4 py-2 rounded text-white border border-slate-600">50k</button>
                         </div>
-                        
                         <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden border border-slate-600">
@@ -355,412 +310,199 @@
 
     </main>
 
-    <!-- 底部導航欄 (5個按鈕) -->
+    <!-- 底部導航欄 -->
     <nav class="fixed bottom-0 w-full bg-slate-900 border-t border-slate-800 flex justify-between items-center px-2 py-2 pb-5 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
         <button onclick="switchPage('home')" class="nav-btn w-1/5 flex flex-col items-center gap-1 text-orange-500 transition-all active:scale-90">
-            <i class="fa-solid fa-gamepad text-lg"></i>
-            <span class="text-[9px] font-bold">PLAY</span>
+            <i class="fa-solid fa-gamepad text-lg"></i> <span class="text-[9px] font-bold">PLAY</span>
         </button>
         <button onclick="switchPage('earn')" class="nav-btn w-1/5 flex flex-col items-center gap-1 text-slate-500 transition-all active:scale-90">
-            <i class="fa-solid fa-money-bill-wave text-lg"></i>
-            <span class="text-[9px] font-bold">EARN</span>
+            <i class="fa-solid fa-money-bill-wave text-lg"></i> <span class="text-[9px] font-bold">EARN</span>
         </button>
         <button onclick="switchPage('airdrop')" class="nav-btn w-1/5 flex flex-col items-center gap-1 text-slate-500 transition-all active:scale-90">
             <div class="relative">
                 <i class="fa-solid fa-parachute-box text-lg"></i>
                 <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </div>
             <span class="text-[9px] font-bold">AIRDROP</span>
         </button>
         <button onclick="switchPage('lucky')" class="nav-btn w-1/5 flex flex-col items-center gap-1 text-slate-500 transition-all active:scale-90">
-            <i class="fa-solid fa-dice text-lg"></i>
-            <span class="text-[9px] font-bold">LUCKY</span>
+            <i class="fa-solid fa-dice text-lg"></i> <span class="text-[9px] font-bold">LUCKY</span>
         </button>
         <button onclick="switchPage('shop')" class="nav-btn w-1/5 flex flex-col items-center gap-1 text-slate-500 transition-all active:scale-90">
-            <i class="fa-solid fa-store text-lg"></i>
-            <span class="text-[9px] font-bold">SHOP</span>
+            <i class="fa-solid fa-store text-lg"></i> <span class="text-[9px] font-bold">SHOP</span>
         </button>
     </nav>
 
     <!-- JS 邏輯 -->
     <script>
-        // --- 核心狀態 ---
         const defaultState = {
-            score: 0,
-            level: 1,
-            energy: 1000,
-            maxEnergy: 1000,
-            clickPower: 1,
-            lastLogin: Date.now(),
+            score: 0, level: 1, energy: 1000, maxEnergy: 1000, clickPower: 1, lastLogin: Date.now(),
             tasks: { twitter: false, telegram: false, dailyLastClaim: 0, dailyStreak: 0 },
-            upgrades: { click: 1, energy: 1 },
-            skins: ['default'],
-            currentSkin: 'default',
-            lastSpin: 0,
-            referrals: 0,
-            referralEarnings: 0
+            upgrades: { click: 1, energy: 1 }, skins: ['default'], currentSkin: 'default', lastSpin: 0, referrals: 0, referralEarnings: 0
         };
-
         let gameState = JSON.parse(localStorage.getItem('0xChonk_v2.0')) || defaultState;
-        
-        // 每日獎勵配置 (連續簽到)
         const DAILY_REWARDS = [500, 1000, 2500, 5000, 10000, 25000, 100000];
         const LEVEL_THRESHOLDS = [0, 5000, 25000, 100000, 500000, 1000000];
         const RANKS = ["Stray Cat", "House Cat", "Chonker", "Mega Chonker", "OH LAWD", "GODZILLA"];
 
-        // --- 初始化 ---
         function init() {
-            calculateOfflineEnergy();
-            startEnergyRegen();
-            applySkin(gameState.currentSkin);
-            renderDailyRewards();
-            updateUI();
-            checkTasks();
-            updateShopUI();
+            calculateOfflineEnergy(); startEnergyRegen(); applySkin(gameState.currentSkin);
+            renderDailyRewards(); updateUI(); checkTasks(); updateShopUI();
         }
 
-        // --- 核心邏輯 ---
-        function saveGame() {
-            localStorage.setItem('0xChonk_v2.0', JSON.stringify(gameState));
-        }
+        function saveGame() { localStorage.setItem('0xChonk_v2.0', JSON.stringify(gameState)); }
 
         function calculateOfflineEnergy() {
-            const now = Date.now();
-            const secondsPassed = (now - gameState.lastLogin) / 1000;
+            const now = Date.now(); const secondsPassed = (now - gameState.lastLogin) / 1000;
             const regen = Math.floor(secondsPassed * 1); 
             gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + regen);
-            gameState.lastLogin = now;
-            saveGame();
+            gameState.lastLogin = now; saveGame();
         }
-
         function startEnergyRegen() {
-            setInterval(() => {
-                if (gameState.energy < gameState.maxEnergy) {
-                    gameState.energy += 1;
-                    updateUI();
-                    saveGame(); // 低頻存檔最好，這裡為了演示每秒存
-                }
-            }, 1000);
+            setInterval(() => { if (gameState.energy < gameState.maxEnergy) { gameState.energy += 1; updateUI(); saveGame(); } }, 1000);
         }
 
-        // --- 點擊事件 ---
         const clickZone = document.getElementById('click-zone');
         clickZone.addEventListener('pointerdown', (e) => {
-            e.preventDefault(); // 防止手機瀏覽器縮放/選取
-            
+            e.preventDefault();
             if (gameState.energy >= gameState.clickPower) {
-                // 震動
                 if (navigator.vibrate) navigator.vibrate(15);
-                
-                // 數據更新
                 gameState.energy -= gameState.clickPower;
-                
-                // 爆擊 (Crit)
                 const isCrit = Math.random() < 0.1;
-                const baseGain = gameState.clickPower;
-                const finalGain = isCrit ? baseGain * 5 : baseGain;
-                
+                const finalGain = isCrit ? gameState.clickPower * 5 : gameState.clickPower;
                 gameState.score += finalGain;
-                
-                // 視覺特效
                 createFloatingText(e.clientX, e.clientY, finalGain, isCrit);
-                checkLevelUp();
-                updateUI();
+                checkLevelUp(); updateUI();
             } else {
-                // 沒能量動畫
-                clickZone.classList.add('opacity-50');
-                setTimeout(() => clickZone.classList.remove('opacity-50'), 100);
+                clickZone.classList.add('opacity-50'); setTimeout(() => clickZone.classList.remove('opacity-50'), 100);
             }
         });
 
         function createFloatingText(x, y, amount, isCrit) {
             const el = document.createElement('div');
-            // 加入隨機偏移
-            const randomX = (Math.random() - 0.5) * 40;
-            
             el.className = `float-number text-2xl ${isCrit ? 'text-red-500 text-4xl z-50' : 'text-white'}`;
             el.innerHTML = isCrit ? `🔥+${amount}` : `+${amount}`;
-            el.style.left = `${x + randomX}px`;
-            el.style.top = `${y - 50}px`;
-            
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
+            el.style.left = `${x + (Math.random() - 0.5) * 40}px`; el.style.top = `${y - 50}px`;
+            document.body.appendChild(el); setTimeout(() => el.remove(), 600);
         }
 
         function checkLevelUp() {
             const nextThreshold = LEVEL_THRESHOLDS[gameState.level];
             if (nextThreshold && gameState.score >= nextThreshold) {
-                gameState.level++;
-                alert(`LEVEL UP! You are now LV.${gameState.level}`);
-                saveGame();
+                gameState.level++; alert(`LEVEL UP! You are now LV.${gameState.level}`); saveGame();
             }
         }
 
-        // --- 每日簽到邏輯 (核心增強) ---
         function renderDailyRewards() {
-            const container = document.getElementById('daily-container');
-            container.innerHTML = '';
-            
-            // 檢查是否斷簽 (超過48小時未領視為斷簽，或是簡單的隔日邏輯)
-            // 這裡簡化：只要 dailyLastClaim 不是今天，就算可領。如果是昨天，Streak+1，否則重置。
-            const now = new Date();
-            const lastClaimDate = new Date(gameState.tasks.dailyLastClaim);
+            const container = document.getElementById('daily-container'); container.innerHTML = '';
+            const now = new Date(); const lastClaimDate = new Date(gameState.tasks.dailyLastClaim);
             const isSameDay = now.toDateString() === lastClaimDate.toDateString();
-            
-            // 渲染 7 天格子
             DAILY_REWARDS.forEach((reward, index) => {
-                const dayNum = index + 1;
                 const isCompleted = index < gameState.tasks.dailyStreak;
                 const isCurrent = index === gameState.tasks.dailyStreak;
-                
                 let boxClass = "min-w-[70px] bg-slate-800 rounded-lg p-2 flex flex-col items-center border border-slate-700 opacity-50";
-                
                 if (isCompleted) boxClass = "min-w-[70px] bg-green-900/50 border-green-500 rounded-lg p-2 flex flex-col items-center opacity-100";
                 if (isCurrent) boxClass = "min-w-[70px] bg-yellow-500/20 border-yellow-500 rounded-lg p-2 flex flex-col items-center scale-105 shadow-lg border-2 opacity-100";
-
-                const html = `
-                    <div class="${boxClass}">
-                        <span class="text-[9px] text-slate-400 font-bold uppercase">Day ${dayNum}</span>
-                        <div class="my-1 text-lg">${index === 6 ? '👑' : '🥩'}</div>
-                        <span class="text-[10px] font-black ${isCurrent ? 'text-yellow-400' : 'text-slate-300'}">${formatNumber(reward)}</span>
-                    </div>
-                `;
-                container.innerHTML += html;
+                container.innerHTML += `<div class="${boxClass}"><span class="text-[9px] text-slate-400 font-bold uppercase">Day ${index+1}</span><div class="my-1 text-lg">${index === 6 ? '👑' : '🥩'}</div><span class="text-[10px] font-black ${isCurrent ? 'text-yellow-400' : 'text-slate-300'}">${formatNumber(reward)}</span></div>`;
             });
-
-            // 按鈕狀態
             const btn = document.getElementById('btn-claim-daily');
-            if (isSameDay) {
-                btn.innerText = "COME BACK TOMORROW";
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.onclick = null;
-            } else {
-                btn.innerText = "CLAIM REWARD";
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.onclick = claimDaily;
-            }
+            if (isSameDay) { btn.innerText = "COME BACK TOMORROW"; btn.classList.add('opacity-50', 'cursor-not-allowed'); btn.onclick = null; }
+            else { btn.innerText = "CLAIM REWARD"; btn.classList.remove('opacity-50', 'cursor-not-allowed'); btn.onclick = claimDaily; }
         }
 
         function claimDaily() {
             const currentStreak = gameState.tasks.dailyStreak;
-            const reward = DAILY_REWARDS[currentStreak];
-            
-            gameState.score += reward;
+            gameState.score += DAILY_REWARDS[currentStreak];
             gameState.tasks.dailyLastClaim = Date.now();
-            
-            // 推進天數，如果滿7天重置
-            if (gameState.tasks.dailyStreak < 6) {
-                gameState.tasks.dailyStreak++;
-            } else {
-                gameState.tasks.dailyStreak = 0;
-            }
-            
-            saveGame();
-            renderDailyRewards();
-            updateUI();
-            alert(`Claimed ${reward} Coins!`);
+            if (gameState.tasks.dailyStreak < 6) gameState.tasks.dailyStreak++; else gameState.tasks.dailyStreak = 0;
+            saveGame(); renderDailyRewards(); updateUI(); alert(`Claimed ${DAILY_REWARDS[currentStreak]} Coins!`);
         }
 
-        // --- 任務系統 ---
+        // --- 任務邏輯更新 (您的連結) ---
         function doTask(taskId) {
-            // 這裡應該跳轉連結
-            if (taskId === 'twitter') window.open('https://twitter.com', '_blank');
-            if (taskId === 'telegram') window.open('https://telegram.org', '_blank');
+            // Updated Links from User
+            if (taskId === 'twitter') window.open('https://x.com/wendan2002?s=21&t=ay2DEKE011j_yvvPXPAMJg', '_blank');
+            if (taskId === 'telegram') window.open('https://t.me/ZeroXchonkannouncement', '_blank');
 
             if (!gameState.tasks[taskId]) {
-                // 模擬延遲驗證
                 setTimeout(() => {
-                    gameState.tasks[taskId] = true;
-                    gameState.score += 5000;
-                    saveGame();
-                    updateUI();
-                    checkTasks();
-                    alert("Task Completed! +5000");
+                    gameState.tasks[taskId] = true; gameState.score += 5000;
+                    saveGame(); updateUI(); checkTasks(); alert("Task Completed! +5000");
                 }, 2000);
             }
         }
 
         function checkTasks() {
-            if (gameState.tasks.twitter) {
-                const btn = document.getElementById('btn-twitter');
-                btn.innerText = "Done";
-                btn.className = "bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
-                btn.onclick = null;
-            }
-            if (gameState.tasks.telegram) {
-                const btn = document.getElementById('btn-telegram');
-                btn.innerText = "Done";
-                btn.className = "bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
-                btn.onclick = null;
-            }
+            if (gameState.tasks.twitter) { const btn = document.getElementById('btn-twitter'); btn.innerText = "Done"; btn.className = "bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg"; btn.onclick = null; }
+            if (gameState.tasks.telegram) { const btn = document.getElementById('btn-telegram'); btn.innerText = "Done"; btn.className = "bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg"; btn.onclick = null; }
         }
 
-        // --- UI 更新工具 ---
         function updateUI() {
             document.getElementById('score-display').innerText = gameState.score.toLocaleString();
             document.getElementById('energy-current').innerText = Math.floor(gameState.energy);
             document.getElementById('energy-max').innerText = gameState.maxEnergy;
             document.getElementById('level-display').innerText = gameState.level;
             document.getElementById('rank-display').innerText = RANKS[Math.min(gameState.level-1, RANKS.length-1)];
-            
-            const pct = (gameState.energy / gameState.maxEnergy) * 100;
-            document.getElementById('energy-bar').style.width = `${pct}%`;
-            
-            // 邀請數據更新
+            document.getElementById('energy-bar').style.width = `${(gameState.energy / gameState.maxEnergy) * 100}%`;
             document.getElementById('referral-count').innerText = gameState.referrals;
             document.getElementById('referral-earned').innerText = gameState.referralEarnings;
         }
 
-        function formatNumber(num) {
-            if(num >= 1000) return (num/1000).toFixed(1) + 'k';
-            return num;
-        }
+        function formatNumber(num) { if(num >= 1000) return (num/1000).toFixed(1) + 'k'; return num; }
 
-        // --- 頁面切換 ---
         function switchPage(pageId) {
-            // 隱藏所有頁面
             document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
-            // 顯示目標頁面
             document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            
-            // 更新底部導航顏色
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-orange-500');
-                btn.classList.add('text-slate-500');
-            });
-            // 讓點擊的按鈕變色 (這裡簡單抓 event，實際可能要用 ID 對應)
-            event.currentTarget.classList.remove('text-slate-500');
-            event.currentTarget.classList.add('text-orange-500');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-orange-500'); btn.classList.add('text-slate-500'); });
+            event.currentTarget.classList.remove('text-slate-500'); event.currentTarget.classList.add('text-orange-500');
         }
 
-        // --- 商店購買邏輯 ---
         function updateShopUI() {
-            const clickCost = Math.floor(500 * Math.pow(1.5, gameState.upgrades.click));
-            const energyCost = Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy));
-            
-            document.getElementById('cost-click').innerText = formatNumber(clickCost);
+            document.getElementById('cost-click').innerText = formatNumber(Math.floor(500 * Math.pow(1.5, gameState.upgrades.click)));
             document.getElementById('lvl-click').innerText = gameState.upgrades.click;
-            document.getElementById('cost-energy').innerText = formatNumber(energyCost);
+            document.getElementById('cost-energy').innerText = formatNumber(Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy)));
             document.getElementById('lvl-energy').innerText = gameState.upgrades.energy;
-            
-            // Skin 按鈕狀態
-            if(gameState.skins.includes('gold')) {
-                const btn = document.getElementById('btn-skin-gold');
-                if(gameState.currentSkin === 'gold') {
-                    btn.innerText = "USED"; btn.className = "bg-green-600 text-[10px] font-bold px-4 py-2 rounded text-white";
-                } else {
-                    btn.innerText = "EQUIP"; btn.className = "bg-blue-600 text-[10px] font-bold px-4 py-2 rounded text-white"; btn.onclick = () => equipSkin('gold');
-                }
-            }
-            if(gameState.skins.includes('hacker')) {
-                const btn = document.getElementById('btn-skin-hacker');
-                if(gameState.currentSkin === 'hacker') {
-                    btn.innerText = "USED"; btn.className = "bg-green-600 text-[10px] font-bold px-4 py-2 rounded text-white";
-                } else {
-                    btn.innerText = "EQUIP"; btn.className = "bg-blue-600 text-[10px] font-bold px-4 py-2 rounded text-white"; btn.onclick = () => equipSkin('hacker');
-                }
-            }
+            if(gameState.skins.includes('gold')) { const btn = document.getElementById('btn-skin-gold'); btn.innerText = gameState.currentSkin === 'gold' ? "USED" : "EQUIP"; btn.className = gameState.currentSkin === 'gold' ? "bg-green-600 text-[10px] font-bold px-4 py-2 rounded text-white" : "bg-blue-600 text-[10px] font-bold px-4 py-2 rounded text-white"; if(gameState.currentSkin !== 'gold') btn.onclick = () => equipSkin('gold'); }
+            if(gameState.skins.includes('hacker')) { const btn = document.getElementById('btn-skin-hacker'); btn.innerText = gameState.currentSkin === 'hacker' ? "USED" : "EQUIP"; btn.className = gameState.currentSkin === 'hacker' ? "bg-green-600 text-[10px] font-bold px-4 py-2 rounded text-white" : "bg-blue-600 text-[10px] font-bold px-4 py-2 rounded text-white"; if(gameState.currentSkin !== 'hacker') btn.onclick = () => equipSkin('hacker'); }
         }
 
         function buyUpgrade(type) {
-            let cost = 0;
-            if (type === 'click') {
-                cost = Math.floor(500 * Math.pow(1.5, gameState.upgrades.click));
-                if (gameState.score >= cost) {
-                    gameState.score -= cost;
-                    gameState.upgrades.click++;
-                    gameState.clickPower++;
-                    alert("Power Up!");
-                } else alert("Not enough cash!");
-            } else {
-                cost = Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy));
-                if (gameState.score >= cost) {
-                    gameState.score -= cost;
-                    gameState.upgrades.energy++;
-                    gameState.maxEnergy += 500;
-                    gameState.energy = gameState.maxEnergy;
-                    alert("Tank Upgraded!");
-                } else alert("Not enough cash!");
-            }
-            saveGame();
-            updateUI();
-            updateShopUI();
+            let cost = type === 'click' ? Math.floor(500 * Math.pow(1.5, gameState.upgrades.click)) : Math.floor(1000 * Math.pow(1.5, gameState.upgrades.energy));
+            if (gameState.score >= cost) {
+                gameState.score -= cost; gameState.upgrades[type]++;
+                if (type === 'click') gameState.clickPower++; else { gameState.maxEnergy += 500; gameState.energy = gameState.maxEnergy; }
+                alert(type === 'click' ? "Power Up!" : "Tank Upgraded!");
+            } else alert("Not enough cash!");
+            saveGame(); updateUI(); updateShopUI();
         }
 
         function buySkin(id, cost) {
             if (gameState.skins.includes(id)) return;
-            if (gameState.score >= cost) {
-                gameState.score -= cost;
-                gameState.skins.push(id);
-                alert("Skin Acquired!");
-                equipSkin(id);
-            } else alert("Too expensive!");
-            saveGame();
-            updateUI();
-            updateShopUI();
+            if (gameState.score >= cost) { gameState.score -= cost; gameState.skins.push(id); alert("Skin Acquired!"); equipSkin(id); } else alert("Too expensive!");
+            saveGame(); updateUI(); updateShopUI();
         }
 
-        function equipSkin(id) {
-            gameState.currentSkin = id;
-            applySkin(id);
-            saveGame();
-            updateShopUI();
-        }
+        function equipSkin(id) { gameState.currentSkin = id; applySkin(id); saveGame(); updateShopUI(); }
+        function applySkin(id) { document.getElementById('cat-avatar').className = `cat-bounce w-full h-full relative z-10 filter drop-shadow-2xl skin-${id}`; }
+        function copyInvite() { navigator.clipboard.writeText(`https://t.me/0xChonkBot?start=ref_${Date.now()}`); alert("Link Copied! Send it to your squad!"); }
 
-        function applySkin(id) {
-            const cat = document.getElementById('cat-avatar');
-            cat.className = `cat-bounce w-full h-full relative z-10 filter drop-shadow-2xl skin-${id}`;
-        }
-
-        // --- 病毒邀請 ---
-        function copyInvite() {
-            // 模擬複製
-            navigator.clipboard.writeText(`https://t.me/0xChonkBot?start=ref_${Date.now()}`);
-            alert("Link Copied! Send it to your squad!");
-        }
-
-        // --- 轉盤 ---
         let isSpinning = false;
         function spinWheel() {
             if(isSpinning) return;
-            
-            // 簡單冷卻
-            const now = Date.now();
-            if(now - gameState.lastSpin < 60000) {
-                alert("Please wait 1 minute between spins!");
-                return;
-            }
-            
-            isSpinning = true;
-            const wheel = document.getElementById('wheel');
-            const resultText = document.getElementById('spin-result');
-            
-            // 隨機轉 3-6 圈
+            if(Date.now() - gameState.lastSpin < 60000) { alert("Please wait 1 minute between spins!"); return; }
+            isSpinning = true; const wheel = document.getElementById('wheel');
             const deg = 1800 + Math.random() * 360;
-            wheel.style.transition = "transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)";
-            wheel.style.transform = `rotate(${deg}deg)`;
-            
+            wheel.style.transition = "transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)"; wheel.style.transform = `rotate(${deg}deg)`;
             setTimeout(() => {
-                isSpinning = false;
-                gameState.lastSpin = Date.now();
-                // 假結果
+                isSpinning = false; gameState.lastSpin = Date.now();
                 const reward = [1000, 5000, 0, 10000][Math.floor(Math.random()*4)];
-                if(reward > 0) {
-                    gameState.score += reward;
-                    resultText.innerText = `WIN: ${reward}`;
-                    alert(`BIG WIN! +${reward}`);
-                } else {
-                    resultText.innerText = "BAD LUCK...";
-                }
-                wheel.style.transition = "none";
-                wheel.style.transform = `rotate(${deg % 360}deg)`;
-                saveGame();
-                updateUI();
+                if(reward > 0) { gameState.score += reward; document.getElementById('spin-result').innerText = `WIN: ${reward}`; alert(`BIG WIN! +${reward}`); } 
+                else document.getElementById('spin-result').innerText = "BAD LUCK...";
+                wheel.style.transition = "none"; wheel.style.transform = `rotate(${deg % 360}deg)`;
+                saveGame(); updateUI();
             }, 3000);
         }
 
-        // 啟動遊戲
         init();
     </script>
 </body>
